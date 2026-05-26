@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -62,12 +63,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts   Account[]
-  sessions   Session[]
-  business   Business?
-  reviews    Review[]  @relation("ReviewAuthor")
-  quotes     Quote[]   @relation("QuoteCustomer")
-  inquiries  Inquiry[] @relation("InquiryCustomer")
+  accounts           Account[]
+  sessions           Session[]
+  business           Business?
+  reviews            Review[]             @relation("ReviewAuthor")
+  quotes             Quote[]              @relation("QuoteCustomer")
+  inquiries          Inquiry[]            @relation("InquiryCustomer")
+  consentApplications ConsentApplication[]
 }
 
 // ─── Business Profiles ──────────────────────────────────────────────────────
@@ -231,6 +233,46 @@ model Inquiry {
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   customer User?    @relation("InquiryCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+}
+
+// ─── Council Consents ────────────────────────────────────────────────────────
+
+enum ConsentApplicationStatus {
+  DRAFT
+  SUBMITTED
+  PROCESSING
+  APPROVED
+  DECLINED
+}
+
+model ConsentApplication {
+  id               String                   @id @default(cuid())
+  userId           String
+  councilId        String
+  consentTypeId    String
+  title            String
+  description      String?                  @db.Text
+  siteAddress      String?
+  referenceNumber  String?
+  status           ConsentApplicationStatus @default(DRAFT)
+  submittedAt      DateTime?
+  decidedAt        DateTime?
+  notes            String?                  @db.Text
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  user               User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  correspondenceLogs ConsentCorrespondenceLog[]
+}
+
+model ConsentCorrespondenceLog {
+  id                   String   @id @default(cuid())
+  consentApplicationId String
+  date                 DateTime @db.Date
+  summary              String
+  createdAt            DateTime @default(now())
+
+  application ConsentApplication @relation(fields: [consentApplicationId], references: [id], onDelete: Cascade)
 }
 
 // ─── Invoices ────────────────────────────────────────────────────────────────

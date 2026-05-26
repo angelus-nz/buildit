@@ -1,0 +1,393 @@
+{
+  "councils": [
+    {
+      "id": "nelson-city",
+      "name": "Nelson City Council",
+      "shortName": "Nelson",
+      "region": "Nelson-Tasman",
+      "website": "https://www.nelson.govt.nz",
+      "consentPage": "https://www.nelson.govt.nz/consents-and-licences/building-consents/",
+      "phone": "03 546 0200",
+      "email": "ncc@nelsoncitycouncil.govt.nz",
+      "address": "110 Trafalgar Street, Nelson 7010",
+      "postalAddress": "PO Box 645, Nelson 7040",
+      "buildingOfficeHours": "Monday–Friday, 8:30am–4:30pm",
+      "consentTypes": [
+        {
+          "id": "building-consent",
+          "name": "Building Consent",
+          "description": "Required before starting most building work, including new builds, alterations, additions, and some maintenance. Ensures work meets the New Zealand Building Code.",
+          "whoNeedsIt": "Anyone undertaking building work that is not exempt under the Building Act 2004.",
+          "processingTime": "20 working days (statutory maximum)",
+          "feeEstimate": "$1,200–$3,500+ depending on project value",
+          "feeNotes": "Fees are based on the value of the building work. A minimum lodgement fee applies. Additional inspection fees may apply.",
+          "requiredDocuments": [
+            "Completed BC1 application form",
+            "Producer Statement (PS1) from your designer",
+            "Site plan (to scale)",
+            "Floor plans and elevations",
+            "Specifications and details",
+            "Structural engineer's PS1 if required",
+            "Certificate of Title or proof of ownership"
+          ],
+          "usefulLinks": [
+            {
+              "label": "Nelson CC Building Consent Info",
+              "url": "https://www.nelson.govt.nz/consents-and-licences/building-consents/"
+            },
+            {
+              "label": "MBIE Building Performance",
+              "url": "https://www.building.govt.nz/building-code-compliance/"
+            }
+          ],
+          "templateId": "building-consent-application"
+        },
+        {
+          "id": "resource-consent",
+          "name": "Resource Consent",
+          "description": "Required when your proposed activity doesn't comply with the Nelson Resource Management Plan. Covers land use, subdivision, and effects on the environment.",
+          "whoNeedsIt": "Anyone undertaking activities that require consent under the Resource Management Act 1991 (RMA) or the Nelson Resource Management Plan.",
+          "processingTime": "20 working days (non-notified), longer if notified",
+          "feeEstimate": "$900–$5,000+ depending on complexity",
+          "feeNotes": "Initial lodgement deposit required. Actual costs charged on a time and cost basis. Complex or notified consents cost significantly more.",
+          "requiredDocuments": [
+            "Application form with assessment of environmental effects (AEE)",
+            "Site plan and locality map",
+            "Certificate of Title",
+            "Proposed plans showing the activity",
+            "Written approval from affected neighbours (if applicable)"
+          ],
+          "usefulLinks": [
+            {
+              "label": "Nelson CC Resource Consent Info",
+              "url": "https://www.nelson.govt.nz/consents-and-licences/resource-consents/"
+            },
+            {
+              "label": "Nelson Resource Management Plan",
+              "url": "https://www.nelson.govt.nz/planning/nelson-resource-management-plan/"
+            }
+          ],
+          "templateId": "resource-consent-application"
+        },
+        {
+          "id": "lim-report",
+          "name": "LIM Report (Land Information Memorandum)",
+          "description": "A document issued by the council containing information about a property known to the council — including consents, notices, zoning, and any special features or hazards.",
+          "whoNeedsIt": "Buyers, property owners, developers, and anyone wanting a full picture of a property's history and requirements.",
+          "processingTime": "10 working days (statutory maximum)",
+          "feeEstimate": "$268–$380",
+          "feeNotes": "Standard fee applies. Urgent LIMs may incur additional charges if offered.",
+          "requiredDocuments": [
+            "LIM application form",
+            "Payment of fee",
+            "Property address or legal description"
+          ],
+          "usefulLinks": [
+            {
+              "label": "Nelson CC LIM Applications",
+              "url": "https://www.nelson.govt.nz/property-rates-and-valuations/lim-applications/"
+            }
+          ],
+          "templateId": "lim-report-application"
+        },
+        {
+          "id": "certificate-of-acceptance",
+          "name": "Certificate of Acceptance",
+          "description": "Issued for building work carried out without a building consent (e.g. urgent work or work that pre-dates consent requirements). It confirms the council has inspected the work and it complies with the Building Code as far as can be determined.",
+          "whoNeedsIt": "Anyone who needs to legalise building work done without a consent, typically during property sale or when refinancing.",
+          "processingTime": "20 working days",
+          "feeEstimate": "$800–$2,500+ depending on scope",
+          "feeNotes": "Fees similar to building consents. Council may refuse if the work cannot be inspected adequately.",
+          "requiredDocuments": [
+            "Completed application form",
+            "Photos of the completed work",
+            "As-built drawings",
+            "Any existing consents or documentation for the work",
+            "Producer Statements from tradespeople if available"
+          ],
+          "usefulLinks": [
+            {
+              "label": "MBIE Certificate of Acceptance Guidance",
+              "url": "https://www.building.govt.nz/projects-and-consents/certificates-of-acceptance/"
+            }
+          ],
+          "templateId": "certificate-of-acceptance-application"
+        }
+      ]
+    },
+    {
+      "id": "tasman-district",
+      "name": "Tasman District Council",
+      "shortName": "Tasman",
+      "region": "Nelson-Tasman",
+      "website": "https://www.tasman.govt.nz",
+      "consentPage": "https://www.tasman.govt.nz/my-community/consents/building-consents/",
+      "phone": "03 543 8400",
+      "email": "tdc@tasman.govt.nz",
+      "address": "189 Queen Street, Richmond 7020",
+      "postalAddress": "Private Bag 4, Richmond 7050",
+      "buildingOfficeHours": "Monday–Friday, 8:30am–5:00pm",
+      "consentTypes": [
+        {
+          "id": "building-consent",
+          "name": "Building Consent",
+          "description": "Required before starting most building work, including new builds, alterations, additions, and some maintenance. Ensures work meets the New Zealand Building Code.",
+          "whoNeedsIt": "Anyone undertaking building work that is not exempt under the Building Act 2004.",
+          "processingTime": "20 working days (statutory maximum)",
+          "feeEstimate": "$1,100–$3,200+ depending on project value",
+          "feeNotes": "Tasman uses a fee schedule based on project value. Lodgement fees, inspection fees, and processing fees all apply.",
+          "requiredDocuments": [
+            "Completed building consent application",
+            "Producer Statement (PS1) from your designer",
+            "Site plan (to scale) showing property boundaries",
+            "Floor plans, elevations, and cross-sections",
+            "Specifications and construction details",
+            "Structural calculations if required",
+            "Certificate of Title"
+          ],
+          "usefulLinks": [
+            {
+              "label": "Tasman DC Building Consents",
+              "url": "https://www.tasman.govt.nz/my-community/consents/building-consents/"
+            },
+            {
+              "label": "Applying for a Consent (Tasman)",
+              "url": "https://www.tasman.govt.nz/my-community/consents/building-consents/applying-for-a-consent/"
+            }
+          ],
+          "templateId": "building-consent-application"
+        },
+        {
+          "id": "resource-consent",
+          "name": "Resource Consent",
+          "description": "Required when your proposed activity doesn't comply with the Tasman Resource Management Plan. Covers land use, subdivision, coastal activities, and environmental effects.",
+          "whoNeedsIt": "Anyone undertaking activities requiring consent under the RMA or the Tasman Resource Management Plan.",
+          "processingTime": "20 working days (non-notified), longer if notified",
+          "feeEstimate": "$1,000–$6,000+ depending on complexity",
+          "feeNotes": "Deposit required upfront. Full costs charged on time and expense basis. Notify Tasman DC early for complex applications.",
+          "requiredDocuments": [
+            "Resource consent application form with AEE",
+            "Site plan and locality/aerial map",
+            "Certificate of Title",
+            "Plans showing proposed works",
+            "Written approvals from affected parties"
+          ],
+          "usefulLinks": [
+            {
+              "label": "Tasman DC Resource Consents",
+              "url": "https://www.tasman.govt.nz/my-community/consents/resource-consents/"
+            },
+            {
+              "label": "Tasman Environment Plan",
+              "url": "https://www.tasman.govt.nz/my-community/planning/tasman-environment-plan/"
+            }
+          ],
+          "templateId": "resource-consent-application"
+        },
+        {
+          "id": "lim-report",
+          "name": "LIM Report (Land Information Memorandum)",
+          "description": "A document issued by the council containing information about a property — including consents issued, rates, zoning, hazards, and any special classifications or notices.",
+          "whoNeedsIt": "Buyers, owners, developers, and anyone wanting comprehensive information about a property's history.",
+          "processingTime": "10 working days",
+          "feeEstimate": "$285–$395",
+          "feeNotes": "Standard fee. Check Tasman DC website for the current fee schedule.",
+          "requiredDocuments": [
+            "LIM application form",
+            "Payment of applicable fee",
+            "Property address or legal description"
+          ],
+          "usefulLinks": [
+            {
+              "label": "Tasman DC LIM Reports",
+              "url": "https://www.tasman.govt.nz/my-community/property/land-information-memorandum/"
+            }
+          ],
+          "templateId": "lim-report-application"
+        },
+        {
+          "id": "certificate-of-acceptance",
+          "name": "Certificate of Acceptance",
+          "description": "For building work carried out without a consent or where an existing consent cannot be amended. The council inspects the completed work and issues a certificate if it substantially complies with the Building Code.",
+          "whoNeedsIt": "Property owners who need to regularise unconsented building work, often required when selling.",
+          "processingTime": "20 working days",
+          "feeEstimate": "$750–$2,000+ depending on scope",
+          "feeNotes": "Fees are assessed on a case-by-case basis similar to building consent fees.",
+          "requiredDocuments": [
+            "Application form",
+            "Photographs of completed work",
+            "As-built drawings or plans",
+            "Any existing documentation",
+            "Producer Statements from tradespeople (where obtainable)"
+          ],
+          "usefulLinks": [
+            {
+              "label": "MBIE Certificate of Acceptance Guidance",
+              "url": "https://www.building.govt.nz/projects-and-consents/certificates-of-acceptance/"
+            }
+          ],
+          "templateId": "certificate-of-acceptance-application"
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "building-consent-application",
+      "name": "Building Consent Application Guide",
+      "description": "A structured guide to help you prepare your building consent application, including a checklist of required documents and key information to gather before applying.",
+      "applicableTo": ["nelson-city", "tasman-district"],
+      "sections": [
+        {
+          "title": "Project Overview",
+          "fields": [
+            "Project address",
+            "Nature of building work",
+            "Estimated value of work",
+            "Intended use of building"
+          ]
+        },
+        {
+          "title": "Owner Details",
+          "fields": ["Owner name", "Owner address", "Owner phone", "Owner email"]
+        },
+        {
+          "title": "Designer / Agent Details",
+          "fields": [
+            "Designer name",
+            "Designer company",
+            "Designer phone",
+            "Designer email",
+            "PS1 reference number"
+          ]
+        },
+        {
+          "title": "Site Information",
+          "fields": [
+            "Legal description",
+            "Certificate of Title number",
+            "Current use of site",
+            "Proposed use of site"
+          ]
+        },
+        {
+          "title": "Document Checklist",
+          "fields": [
+            "Site plan attached?",
+            "Floor plans attached?",
+            "Elevations attached?",
+            "Specifications attached?",
+            "Structural PS1 attached?",
+            "Certificate of Title attached?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resource-consent-application",
+      "name": "Resource Consent Application Guide",
+      "description": "A structured guide for preparing a resource consent application, including the key sections of an Assessment of Environmental Effects (AEE).",
+      "applicableTo": ["nelson-city", "tasman-district"],
+      "sections": [
+        {
+          "title": "Applicant Details",
+          "fields": ["Applicant name", "Applicant address", "Phone", "Email", "Agent name (if different)"]
+        },
+        {
+          "title": "Site Details",
+          "fields": [
+            "Property address",
+            "Legal description",
+            "Certificate of Title",
+            "Current zone under plan",
+            "Current use of land"
+          ]
+        },
+        {
+          "title": "Activity Description",
+          "fields": [
+            "Describe the proposed activity",
+            "Which rules in the plan does it not comply with?",
+            "Why is resource consent required?"
+          ]
+        },
+        {
+          "title": "Assessment of Environmental Effects (AEE)",
+          "fields": [
+            "Effects on neighbouring properties",
+            "Effects on visual amenity",
+            "Effects on traffic and access",
+            "Effects on stormwater / drainage",
+            "Mitigation measures proposed"
+          ]
+        },
+        {
+          "title": "Affected Parties",
+          "fields": [
+            "List all potentially affected neighbours",
+            "Written approvals obtained?",
+            "Consultation undertaken?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lim-report-application",
+      "name": "LIM Report Application Guide",
+      "description": "A simple guide for applying for a Land Information Memorandum (LIM) from your council.",
+      "applicableTo": ["nelson-city", "tasman-district"],
+      "sections": [
+        {
+          "title": "Applicant Details",
+          "fields": ["Full name", "Postal address", "Phone", "Email"]
+        },
+        {
+          "title": "Property Details",
+          "fields": [
+            "Property address",
+            "Legal description (if known)",
+            "Certificate of Title number (if known)"
+          ]
+        },
+        {
+          "title": "Purpose",
+          "fields": ["Reason for LIM request", "Settlement date (if purchasing)"]
+        }
+      ]
+    },
+    {
+      "id": "certificate-of-acceptance-application",
+      "name": "Certificate of Acceptance Application Guide",
+      "description": "A guide for applying for a Certificate of Acceptance for building work completed without a consent.",
+      "applicableTo": ["nelson-city", "tasman-district"],
+      "sections": [
+        {
+          "title": "Owner Details",
+          "fields": ["Owner name", "Owner address", "Phone", "Email"]
+        },
+        {
+          "title": "Property Details",
+          "fields": ["Site address", "Legal description", "Certificate of Title"]
+        },
+        {
+          "title": "Work Description",
+          "fields": [
+            "Description of building work carried out",
+            "Approximate date work was completed",
+            "Estimated value of work",
+            "Why was no consent obtained?"
+          ]
+        },
+        {
+          "title": "Documentation Available",
+          "fields": [
+            "Photographs of completed work",
+            "As-built drawings available?",
+            "Producer Statements from tradespeople?",
+            "Any existing permit or consent documentation?"
+          ]
+        }
+      ]
+    }
+  ]
+}

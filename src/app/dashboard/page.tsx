@@ -124,9 +124,30 @@ export default async function DashboardPage() {
           </div>
         )}
 
+        {/* Council consents — available to all users */}
+        <div className={isTradesman ? "mt-4" : "mt-6"}>
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">Council consents</h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Navigate NZ council consent processes in Nelson and Tasman. Find fees, required documents, and track applications to approval.
+            </p>
+            <div className="flex gap-3 mt-4">
+              <Link
+                href="/consents"
+                className="text-sm text-blue-600 font-medium hover:underline"
+              >
+                Consent types &amp; contacts
+              </Link>
+              <Link href="/consents/tracker" className="text-sm text-gray-500 hover:underline">
+                My applications
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {!isTradesman && (
-          <p className="text-gray-500 mt-2">
-            Your dashboard is being built. Check back soon.
+          <p className="text-gray-500 mt-4 text-sm">
+            More features coming soon.
           </p>
         )}
       </main>
