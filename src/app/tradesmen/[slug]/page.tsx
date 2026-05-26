@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import { CATEGORY_LABELS } from "@/lib/categories";
 import { ContactForm } from "./ContactForm";
+import { StartConversationButton } from "./StartConversationButton";
 import ReviewsSection from "./ReviewsSection";
 import type { Metadata } from "next";
 
@@ -27,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function TradesmanProfilePage({ params }: Props) {
   const { slug } = await params;
+  const session = await auth();
 
   const business = await prisma.business.findUnique({
     where: { slug, isPublished: true },
@@ -222,6 +225,16 @@ export default async function TradesmanProfilePage({ params }: Props) {
             This business hasn&apos;t added any projects or reviews yet. Check back soon.
           </div>
         )}
+
+        {/* Direct messaging */}
+        <section>
+          <StartConversationButton
+            businessId={business.id}
+            businessName={business.name}
+            isLoggedIn={!!session}
+            isTradesman={session?.user.role === "TRADESMAN"}
+          />
+        </section>
 
         {/* Contact form */}
         <ContactForm businessId={business.id} businessName={business.name} />

@@ -2,6 +2,7 @@ import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { NavUnreadBadge } from "./NavUnreadBadge";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -23,6 +24,29 @@ export default async function DashboardPage() {
       ? await prisma.inquiry.count({ where: { businessId: business.id, status: "PENDING" } })
       : 0;
 
+  const unreadMessages = await (async () => {
+    const participants = await prisma.conversationParticipant.findMany({
+      where: { userId: session.user.id },
+      select: {
+        lastReadAt: true,
+        conversation: {
+          select: {
+            messages: {
+              where: { senderId: { not: session.user.id } },
+              orderBy: { createdAt: "desc" },
+              take: 1,
+              select: { createdAt: true },
+            },
+          },
+        },
+      },
+    });
+    return participants.filter((p) => {
+      const last = p.conversation.messages[0];
+      return last && new Date(last.createdAt) > new Date(p.lastReadAt);
+    }).length;
+  })();
+
   if (isTradesman && !business) {
     redirect("/profile/onboard");
   }
@@ -32,6 +56,7 @@ export default async function DashboardPage() {
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-gray-900">BuildIt</h1>
         <div className="flex items-center gap-4">
+          <NavUnreadBadge />
           <span className="text-sm text-gray-600">
             {session.user.name ?? session.user.email}
           </span>
@@ -123,6 +148,28 @@ export default async function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Messages — available to all users */}
+        <div className={isTradesman ? "mt-0" : "mt-6"}>
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-sm font-semibold text-gray-700">Messages</h3>
+              {unreadMessages > 0 && (
+                <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                  {unreadMessages} unread
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Direct messages with {isTradesman ? "customers" : "tradespeople"}.
+            </p>
+            <div className="mt-4">
+              <Link href="/messages" className="text-sm text-blue-600 font-medium hover:underline">
+                Open messages
+              </Link>
+            </div>
+          </div>
+        </div>
 
         {/* Council consents — available to all users */}
         <div className={isTradesman ? "mt-4" : "mt-6"}>
