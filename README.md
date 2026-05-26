@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BuildIt
 
-## Getting Started
+Tradesman platform for small businesses — showcase work in progress, manage your business, find new customers.
 
-First, run the development server:
+## Stack
+
+- **Next.js 15** — App Router, Server Components
+- **TypeScript** — strict mode
+- **PostgreSQL** + **Prisma ORM**
+- **Tailwind CSS**
+- **NextAuth.js v5** — Google OAuth + email/password
+- **Vitest** — unit testing
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL 15+
+
+### Setup
 
 ```bash
+# 1. Clone and install
+git clone <repo-url>
+cd buildit
+npm install
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your DATABASE_URL and OAuth credentials
+
+# 3. Set up the database
+npm run db:migrate
+
+# 4. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server with Turbopack |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm test` | Run unit tests (Vitest) |
+| `npm run test:watch` | Watch mode |
+| `npm run db:migrate` | Apply database migrations |
+| `npm run db:push` | Push schema changes (dev only) |
+| `npm run db:studio` | Open Prisma Studio |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/                 # Next.js App Router routes
+    (marketing)/       # Public pages (landing, about)
+    (dashboard)/       # Authenticated dashboard
+    api/               # API routes
+  features/            # Feature modules
+    auth/              # Authentication logic
+    business/          # Business profiles
+    projects/          # Work showcase
+    quotes/            # Quote management
+    invoices/          # Invoice management
+    reviews/           # Customer reviews
+  lib/                 # Shared utilities
+    prisma.ts          # Prisma client singleton
+    auth.ts            # NextAuth config
+  test/                # Test utilities and setup
+prisma/
+  schema.prisma        # Database schema
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See `.env.example` for all required variables.
 
-## Deploy on Vercel
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Secret for JWT signing (min 32 chars) |
+| `NEXTAUTH_URL` | Base URL of the app |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## CI
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+GitHub Actions runs on every PR to `main`:
+- ESLint
+- TypeScript type-check
+- Vitest unit tests
