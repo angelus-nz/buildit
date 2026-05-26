@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { CATEGORY_LABELS } from "@/lib/categories";
 import { ContactForm } from "./ContactForm";
+import ReviewsSection from "./ReviewsSection";
 import type { Metadata } from "next";
 
 interface Props {
@@ -33,7 +34,6 @@ export default async function TradesmanProfilePage({ params }: Props) {
       user: { select: { name: true } },
       reviews: {
         orderBy: { createdAt: "desc" },
-        take: 10,
         include: { author: { select: { name: true, image: true } } },
       },
       projects: {
@@ -201,46 +201,21 @@ export default async function TradesmanProfilePage({ params }: Props) {
         )}
 
         {/* Reviews */}
-        {business.reviews.length > 0 && (
-          <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Reviews</h2>
-            <div className="space-y-4">
-              {business.reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="bg-white rounded-xl border border-gray-200 p-5"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center text-sm">
-                      {review.author.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={review.author.image}
-                          alt={review.author.name ?? ""}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        review.author.name?.[0] ?? "?"
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {review.author.name ?? "Anonymous"}
-                      </p>
-                      <p className="text-xs text-yellow-500">
-                        {"★".repeat(review.rating)}
-                        {"☆".repeat(5 - review.rating)}
-                      </p>
-                    </div>
-                  </div>
-                  {review.body && (
-                    <p className="text-sm text-gray-600 leading-relaxed">{review.body}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <ReviewsSection
+          businessId={business.id}
+          businessUserId={business.userId}
+          initialReviews={business.reviews.map((r) => ({
+            id: r.id,
+            rating: r.rating,
+            body: r.body,
+            reply: r.reply,
+            replyAt: r.replyAt?.toISOString() ?? null,
+            createdAt: r.createdAt.toISOString(),
+            authorId: r.authorId,
+            author: r.author,
+          }))}
+          avgRating={avgRating}
+        />
 
         {business.reviews.length === 0 && business.projects.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400 text-sm">
