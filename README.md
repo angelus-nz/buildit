@@ -87,6 +87,39 @@ See `.env.example` for all required variables.
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 
+## Production Deployment
+
+The app deploys to **Vercel** (Sydney region) backed by **Supabase PostgreSQL** (`ap-southeast-2`).
+
+### Supabase project
+
+Project ref: `jbrsbylfjjzbzqnqingm`  
+Dashboard: https://supabase.com/dashboard/project/jbrsbylfjjzbzqnqingm
+
+Migrations are already applied. The connection string is available at:  
+**Supabase Dashboard → Project Settings → Database → Connection string (Transaction pooler)**
+
+### Deploying to Vercel
+
+1. Go to https://vercel.com/new and import `simon-angelus/buildit` from GitHub.
+2. Set these environment variables in Vercel:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | Supabase pooler URL (Transaction mode, port 6543) |
+| `NEXTAUTH_SECRET` | `1doJuBNyygWgSELaqGDdII2FBlYnqEOPMPWfdTzfcX4` |
+| `NEXTAUTH_URL` | Your Vercel deployment URL (e.g. `https://buildit.vercel.app`) |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID (optional — email/password auth works without it) |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (optional) |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for photo uploads |
+| `RESEND_API_KEY` | Resend API key for email notifications (optional) |
+
+3. Click **Deploy** — Vercel auto-deploys on every push to `main`.
+
+### GitHub repo
+
+https://github.com/simon-angelus/buildit
+
 ## CI
 
 GitHub Actions runs on every PR to `main`:
