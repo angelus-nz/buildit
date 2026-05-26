@@ -76,6 +76,24 @@ export default async function DashboardPage() {
                 )}
               </div>
             </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Projects</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Showcase your work in progress and completed jobs.
+              </p>
+              <div className="flex gap-3 mt-4">
+                <Link
+                  href="/dashboard/projects"
+                  className="text-sm text-blue-600 font-medium hover:underline"
+                >
+                  Manage projects
+                </Link>
+                <Link href="/dashboard/projects/new" className="text-sm text-gray-500 hover:underline">
+                  + New project
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 

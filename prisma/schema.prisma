@@ -115,6 +115,7 @@ model Business {
 // ─── Projects (work showcase) ────────────────────────────────────────────────
 
 enum ProjectStatus {
+  PLANNING
   IN_PROGRESS
   COMPLETED
 }
@@ -125,24 +126,39 @@ model Project {
   title       String
   description String?       @db.Text
   status      ProjectStatus @default(IN_PROGRESS)
+  isPublic    Boolean       @default(true)
   startedAt   DateTime?
   completedAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  business Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  updates  ProjectUpdate[]
   images   ProjectImage[]
+}
+
+model ProjectUpdate {
+  id        String   @id @default(cuid())
+  projectId String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  photos  ProjectImage[]
 }
 
 model ProjectImage {
   id        String   @id @default(cuid())
   projectId String
+  updateId  String?
   url       String
   caption   String?
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  update  ProjectUpdate? @relation(fields: [updateId], references: [id], onDelete: SetNull)
 }
 
 // ─── Reviews ────────────────────────────────────────────────────────────────
