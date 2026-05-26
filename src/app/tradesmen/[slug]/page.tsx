@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { CATEGORY_LABELS } from "@/lib/categories";
+import { ContactForm } from "./ContactForm";
 import type { Metadata } from "next";
 
 interface Props {
@@ -246,6 +247,9 @@ export default async function TradesmanProfilePage({ params }: Props) {
             This business hasn&apos;t added any projects or reviews yet. Check back soon.
           </div>
         )}
+
+        {/* Contact form */}
+        <ContactForm businessId={business.id} businessName={business.name} />
       </main>
     </div>
   );

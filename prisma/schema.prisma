@@ -62,11 +62,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  business Business?
-  reviews  Review[]  @relation("ReviewAuthor")
-  quotes   Quote[]   @relation("QuoteCustomer")
+  accounts   Account[]
+  sessions   Session[]
+  business   Business?
+  reviews    Review[]  @relation("ReviewAuthor")
+  quotes     Quote[]   @relation("QuoteCustomer")
+  inquiries  Inquiry[] @relation("InquiryCustomer")
 }
 
 // ─── Business Profiles ──────────────────────────────────────────────────────
@@ -105,11 +106,12 @@ model Business {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects Project[]
-  reviews  Review[]
-  quotes   Quote[]
-  invoices Invoice[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects  Project[]
+  reviews   Review[]
+  quotes    Quote[]
+  invoices  Invoice[]
+  inquiries Inquiry[]
 }
 
 // ─── Projects (work showcase) ────────────────────────────────────────────────
@@ -204,6 +206,31 @@ model Quote {
   business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
   customer User      @relation("QuoteCustomer", fields: [customerId], references: [id], onDelete: Cascade)
   invoice  Invoice?
+}
+
+// ─── Inquiries ───────────────────────────────────────────────────────────────
+
+enum InquiryStatus {
+  PENDING
+  READ
+  REPLIED
+}
+
+model Inquiry {
+  id         String        @id @default(cuid())
+  businessId String
+  customerId String?
+  name       String
+  email      String
+  subject    String
+  message    String        @db.Text
+  reply      String?       @db.Text
+  status     InquiryStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer User?    @relation("InquiryCustomer", fields: [customerId], references: [id], onDelete: SetNull)
 }
 
 // ─── Invoices ────────────────────────────────────────────────────────────────

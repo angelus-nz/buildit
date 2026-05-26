@@ -14,9 +14,14 @@ export default async function DashboardPage() {
   const business = isTradesman
     ? await prisma.business.findUnique({
         where: { userId: session.user.id },
-        select: { slug: true, name: true, isPublished: true },
+        select: { slug: true, name: true, isPublished: true, id: true },
       })
     : null;
+
+  const pendingInquiries =
+    business
+      ? await prisma.inquiry.count({ where: { businessId: business.id, status: "PENDING" } })
+      : 0;
 
   if (isTradesman && !business) {
     redirect("/profile/onboard");
@@ -91,6 +96,28 @@ export default async function DashboardPage() {
                 </Link>
                 <Link href="/dashboard/projects/new" className="text-sm text-gray-500 hover:underline">
                   + New project
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-semibold text-gray-700">Inbox</h3>
+                {pendingInquiries > 0 && (
+                  <span className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                    {pendingInquiries} new
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                View and reply to customer inquiries.
+              </p>
+              <div className="mt-4">
+                <Link
+                  href="/dashboard/inbox"
+                  className="text-sm text-blue-600 font-medium hover:underline"
+                >
+                  Open inbox
                 </Link>
               </div>
             </div>
