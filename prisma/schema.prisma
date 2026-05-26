@@ -168,13 +168,15 @@ model ProjectImage {
 // ─── Reviews ────────────────────────────────────────────────────────────────
 
 model Review {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   businessId String
   authorId   String
   rating     Int
-  body       String?  @db.Text
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  body       String?   @db.Text
+  reply      String?   @db.Text
+  replyAt    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   author   User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)

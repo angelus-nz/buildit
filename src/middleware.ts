@@ -1,5 +1,9 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 import { NextResponse } from "next/server";
+
+// Edge-safe auth: uses JWT-only config without Prisma or bcrypt
+const { auth } = NextAuth(authConfig);
 
 const PROTECTED_PREFIXES = ["/dashboard", "/profile"];
 const AUTH_PATHS = ["/auth/signin", "/auth/register"];
