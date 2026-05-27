@@ -89,7 +89,7 @@ See `.env.example` for all required variables.
 
 ## Production Deployment
 
-**Live URL:** https://buildit-flame.vercel.app
+**Live URL:** https://buildit.angelus.nz
 
 The app deploys to **Vercel** (Sydney region) backed by **Supabase PostgreSQL** (`ap-southeast-2`).
 
