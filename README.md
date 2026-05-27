@@ -89,6 +89,8 @@ See `.env.example` for all required variables.
 
 ## Production Deployment
 
+**Live URL:** https://buildit-flame.vercel.app
+
 The app deploys to **Vercel** (Sydney region) backed by **Supabase PostgreSQL** (`ap-southeast-2`).
 
 ### Supabase project
@@ -116,9 +118,13 @@ Migrations are already applied. The connection string is available at:
 
 3. Click **Deploy** — Vercel auto-deploys on every push to `main`.
 
+### SSL certificate
+
+The Supabase root CA (`certs/supabase-root-ca.pem`) is bundled in the repo. `src/lib/prisma.ts` reads it at startup and passes it to the `pg` pool's `ssl.ca` option so Node.js can verify the full certificate chain without disabling TLS checks.
+
 ### GitHub repo
 
-https://github.com/simon-angelus/buildit
+https://github.com/angelus-nz/buildit
 
 ## CI
 
