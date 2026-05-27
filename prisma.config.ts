@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Vercel-Supabase integration sets POSTGRES_PRISMA_URL (transaction pooler)
+    // Fall back to DATABASE_URL for local dev
+    url: process.env["POSTGRES_PRISMA_URL"] ?? process.env["DATABASE_URL"],
   },
 });
