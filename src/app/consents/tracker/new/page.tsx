@@ -1,37 +1,111 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import councilsData from "@/data/councils.json";
 
+type FormData = Record<string, string>;
+
+interface Template {
+  id: string;
+  name: string;
+  consentTypeId: string | null;
+  formData: FormData;
+}
+
+interface TemplateSection {
+  title: string;
+  fields: string[];
+}
+
+function getTemplateSections(consentTypeId: string): TemplateSection[] {
+  const templateId = councilsData.councils
+    .flatMap((c) => c.consentTypes)
+    .find((ct) => ct.id === consentTypeId)?.templateId;
+  if (!templateId) return [];
+  return councilsData.templates.find((t) => t.id === templateId)?.sections ?? [];
+}
+
 export default function NewConsentApplicationPage() {
   const router = useRouter();
+  const [step, setStep] = useState<1 | 2>(1);
+
   const [councilId, setCouncilId] = useState("");
   const [consentTypeId, setConsentTypeId] = useState("");
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [siteAddress, setSiteAddress] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData>({});
+
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loadTemplateId, setLoadTemplateId] = useState("");
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const fetchTemplates = useCallback(async () => {
+    try {
+      const res = await fetch("/api/consents/templates");
+      if (res.ok) {
+        const data = (await res.json()) as { templates: Template[] };
+        setTemplates(data.templates);
+      }
+    } catch {
+      // non-fatal
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchTemplates();
+  }, [fetchTemplates]);
 
   const selectedCouncil = councilsData.councils.find((c) => c.id === councilId);
   const availableTypes = selectedCouncil?.consentTypes ?? [];
+  const consentTypeName =
+    councilsData.councils.flatMap((c) => c.consentTypes).find((ct) => ct.id === consentTypeId)
+      ?.name ?? "";
+  const sections = getTemplateSections(consentTypeId);
+  const relevantTemplates = templates.filter(
+    (t) => t.consentTypeId === null || t.consentTypeId === consentTypeId,
+  );
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function setField(field: string, value: string) {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function applyTemplate() {
+    const tpl = templates.find((t) => t.id === loadTemplateId);
+    if (!tpl) return;
+    setFormData((prev) => ({ ...prev, ...tpl.formData }));
+    setLoadTemplateId("");
+  }
+
+  async function handleSubmit() {
     setError("");
-    setLoading(true);
+    setSubmitting(true);
 
     try {
+      if (saveAsTemplate && templateName.trim()) {
+        await fetch("/api/consents/templates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: templateName.trim(),
+            consentTypeId: consentTypeId || null,
+            formData,
+          }),
+        });
+      }
+
       const res = await fetch("/api/consents/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ councilId, consentTypeId, title, description, siteAddress }),
+        body: JSON.stringify({ councilId, consentTypeId, title, siteAddress, formData }),
       });
 
       const data = (await res.json()) as { id?: string; error?: string };
-
       if (!res.ok) {
         setError(data.error ?? "Something went wrong");
         return;
@@ -41,7 +115,7 @@ export default function NewConsentApplicationPage() {
     } catch {
       setError("Network error — please try again");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -65,118 +139,258 @@ export default function NewConsentApplicationPage() {
           <span>New</span>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">New consent application</h1>
+        {/* Step indicator */}
+        <div className="flex items-center gap-3 mb-8">
+          {([1, 2] as const).map((n) => (
+            <div key={n} className="flex items-center gap-2">
+              <span
+                className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center transition ${
+                  step === n
+                    ? "bg-blue-600 text-white"
+                    : step > n
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {step > n ? "✓" : n}
+              </span>
+              <span className={`text-sm ${step === n ? "font-medium text-gray-900" : "text-gray-400"}`}>
+                {n === 1 ? "Choose consent type" : "Fill in details"}
+              </span>
+              {n < 2 && <span className="text-gray-300 ml-1">→</span>}
+            </div>
+          ))}
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {step === 1 ? "New consent application" : `${consentTypeName} application`}
+        </h1>
         <p className="text-gray-500 text-sm mb-8">
-          Record a new council consent application to track its progress and correspondence.
+          {step === 1
+            ? "Select the council and consent type to get started."
+            : "Fill in the details below. Use a saved template to auto-fill common fields."}
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-xl border border-gray-200 p-6 space-y-5"
-        >
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-              {error}
+        {/* Step 1 */}
+        {step === 1 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Council <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={councilId}
+                onChange={(e) => {
+                  setCouncilId(e.target.value);
+                  setConsentTypeId("");
+                }}
+                className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select council…</option>
+                {councilsData.councils.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Council <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={councilId}
-              onChange={(e) => {
-                setCouncilId(e.target.value);
-                setConsentTypeId("");
-              }}
-              required
-              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select council…</option>
-              {councilsData.councils.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Consent type <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={consentTypeId}
+                onChange={(e) => setConsentTypeId(e.target.value)}
+                disabled={!councilId}
+                className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <option value="">Select consent type…</option>
+                {availableTypes.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+              {consentTypeId && selectedCouncil && (
+                <p className="text-xs text-gray-400 mt-1">
+                  {selectedCouncil.consentTypes.find((t) => t.id === consentTypeId)?.feeEstimate}
+                  {" — "}
+                  {selectedCouncil.consentTypes.find((t) => t.id === consentTypeId)?.processingTime}
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                disabled={!councilId || !consentTypeId}
+                className="bg-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+              >
+                Next: Fill in details →
+              </button>
+              <Link
+                href="/consents/tracker"
+                className="text-sm text-gray-500 px-5 py-2.5 rounded-lg hover:bg-gray-100 transition"
+              >
+                Cancel
+              </Link>
+            </div>
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Consent type <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={consentTypeId}
-              onChange={(e) => setConsentTypeId(e.target.value)}
-              required
-              disabled={!councilId}
-              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="">Select consent type…</option>
-              {availableTypes.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-            {consentTypeId && selectedCouncil && (
-              <p className="text-xs text-gray-400 mt-1">
-                {selectedCouncil.consentTypes.find((t) => t.id === consentTypeId)?.feeEstimate}
-                {" — "}
-                {selectedCouncil.consentTypes.find((t) => t.id === consentTypeId)?.processingTime}
-              </p>
+        {/* Step 2 */}
+        {step === 2 && (
+          <div className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                {error}
+              </div>
             )}
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Application title <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              placeholder="e.g. New dwelling — 45 Example Street"
-              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            {/* Template loader */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <p className="text-sm font-medium text-blue-900 mb-3">
+                Load from a saved template
+              </p>
+              {relevantTemplates.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <select
+                    value={loadTemplateId}
+                    onChange={(e) => setLoadTemplateId(e.target.value)}
+                    className="flex-1 min-w-0 text-sm border border-blue-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select a template…</option>
+                    {relevantTemplates.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={applyTemplate}
+                    disabled={!loadTemplateId}
+                    className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition whitespace-nowrap"
+                  >
+                    Apply template
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-blue-700">
+                  No templates yet.{" "}
+                  <Link href="/consents/templates/my" className="font-medium underline">
+                    Create one after this application
+                  </Link>
+                  {" "}to auto-fill next time.
+                </p>
+              )}
+              <div className="mt-2 flex justify-end">
+                <Link href="/consents/templates/my" className="text-xs text-blue-600 hover:underline">
+                  Manage my templates →
+                </Link>
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Site address</label>
-            <input
-              type="text"
-              value={siteAddress}
-              onChange={(e) => setSiteAddress(e.target.value)}
-              placeholder="e.g. 45 Example Street, Nelson 7010"
-              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            {/* Title */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              <h2 className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-2">
+                Application overview
+              </h2>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Application title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. New dwelling — 45 Example Street"
+                  className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Site address</label>
+                <input
+                  type="text"
+                  value={siteAddress}
+                  onChange={(e) => setSiteAddress(e.target.value)}
+                  placeholder="e.g. 45 Example Street, Nelson 7010"
+                  className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Brief description of the work or request…"
-              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            />
-          </div>
+            {/* Template sections */}
+            {sections.map((section) => (
+              <div key={section.title} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="bg-gray-50 px-5 py-3 border-b border-gray-200">
+                  <h2 className="text-sm font-semibold text-gray-800">{section.title}</h2>
+                </div>
+                <div className="p-5 grid gap-4 sm:grid-cols-2">
+                  {section.fields.map((field) => (
+                    <div key={field}>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">{field}</label>
+                      <input
+                        type="text"
+                        value={formData[field] ?? ""}
+                        onChange={(e) => setField(field, e.target.value)}
+                        placeholder={`Enter ${field.toLowerCase()}…`}
+                        className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-            >
-              {loading ? "Creating…" : "Create application"}
-            </button>
-            <Link
-              href="/consents/tracker"
-              className="text-sm text-gray-500 px-5 py-2.5 rounded-lg hover:bg-gray-100 transition"
-            >
-              Cancel
-            </Link>
+            {/* Save as template */}
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={saveAsTemplate}
+                  onChange={(e) => setSaveAsTemplate(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                />
+                <span className="text-sm font-medium text-amber-900">
+                  Save these details as a reusable template
+                </span>
+              </label>
+              <p className="text-xs text-amber-700 mt-1 ml-6">
+                Saves your filled-in details so you can auto-fill future applications in one click.
+              </p>
+              {saveAsTemplate && (
+                <div className="mt-3 ml-6">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Template name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="e.g. My Building Consent Defaults"
+                    className="w-full max-w-sm text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="text-sm text-gray-500 px-5 py-2.5 rounded-lg hover:bg-gray-100 transition border border-gray-200"
+              >
+                ← Back
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting || !title}
+                className="bg-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+              >
+                {submitting ? "Creating…" : "Create application"}
+              </button>
+            </div>
           </div>
-        </form>
+        )}
       </main>
     </div>
   );
