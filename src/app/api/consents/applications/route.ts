@@ -17,6 +17,7 @@ const CreateSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
   siteAddress: z.string().max(300).optional(),
+  formData: z.record(z.string(), z.string()).optional(),
 });
 
 export async function GET() {
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid input", issues: parsed.error.issues }, { status: 400 });
   }
 
-  const { councilId, consentTypeId, title, description, siteAddress } = parsed.data;
+  const { councilId, consentTypeId, title, description, siteAddress, formData } = parsed.data;
 
   const application = await prisma.consentApplication.create({
     data: {
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
       title,
       description,
       siteAddress,
+      ...(formData !== undefined && { formData }),
     },
   });
 
