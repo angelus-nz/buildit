@@ -24,6 +24,18 @@ export default async function DashboardPage() {
       ? await prisma.inquiry.count({ where: { businessId: business.id, status: "PENDING" } })
       : 0;
 
+  const activeQuotes = business
+    ? await prisma.quote.count({
+        where: { businessId: business.id, status: { in: ["DRAFT", "SENT", "ACCEPTED"] } },
+      })
+    : 0;
+
+  const unpaidInvoices = business
+    ? await prisma.invoice.count({
+        where: { businessId: business.id, status: { in: ["DRAFT", "SENT", "OVERDUE"] } },
+      })
+    : 0;
+
   const unreadMessages = await (async () => {
     const participants = await prisma.conversationParticipant.findMany({
       where: { userId: session.user.id },
@@ -143,6 +155,53 @@ export default async function DashboardPage() {
                   className="text-sm text-blue-600 font-medium hover:underline"
                 >
                   Open inbox
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-semibold text-gray-700">Quotes</h3>
+                {activeQuotes > 0 && (
+                  <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                    {activeQuotes} active
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Send quotes to customers and track their status.
+              </p>
+              <div className="flex gap-3 mt-4">
+                <Link
+                  href="/dashboard/quotes"
+                  className="text-sm text-blue-600 font-medium hover:underline"
+                >
+                  Manage quotes
+                </Link>
+                <Link href="/dashboard/quotes/new" className="text-sm text-gray-500 hover:underline">
+                  + New quote
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-semibold text-gray-700">Invoices</h3>
+                {unpaidInvoices > 0 && (
+                  <span className="text-xs font-medium bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full">
+                    {unpaidInvoices} unpaid
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Track and mark invoices as paid.
+              </p>
+              <div className="mt-4">
+                <Link
+                  href="/dashboard/invoices"
+                  className="text-sm text-blue-600 font-medium hover:underline"
+                >
+                  Manage invoices
                 </Link>
               </div>
             </div>
