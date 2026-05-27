@@ -8,15 +8,27 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+function stripSslMode(raw: string): string {
+  try {
+    const url = new URL(raw);
+    url.searchParams.delete("sslmode");
+    return url.toString();
+  } catch {
+    return raw;
+  }
+}
+
 function createPrismaClient() {
-  const connectionString =
-    process.env.POSTGRES_PRISMA_URL ?? process.env.DATABASE_URL!;
-  // Supabase's root CA is not in Node's default trust store. Bundling it here
-  // enables full chain verification without disabling TLS checks.
+  const raw = process.env.POSTGRES_PRISMA_URL ?? process.env.DATABASE_URL!;
+  // pg-connection-string v3+ maps sslmode=require → verify-full, which then
+  // overrides any explicit ssl.ca option passed to Pool. Stripping sslmode
+  // from the URL lets our explicit ssl config (with the bundled Supabase root
+  // CA) be the sole TLS configuration, enabling proper chain verification.
+  const connectionString = stripSslMode(raw);
   const ca = readFileSync(
     join(process.cwd(), "certs/supabase-root-ca.pem")
   ).toString();
-  const pool = new Pool({ connectionString, ssl: { ca } });
+  const pool = new Pool({ connectionString, ssl: { ca, rejectUnauthorized: true } });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({
     adapter,
