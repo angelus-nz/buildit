@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -9,14 +11,12 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const connectionString =
     process.env.POSTGRES_PRISMA_URL ?? process.env.DATABASE_URL!;
-  // Supabase's PgBouncer pooler uses an intermediate CA not in Node's default
-  // trust store. rejectUnauthorized:false is required; the endpoint is fixed
-  // (Vercel-Supabase integration URL), so MITM risk is negligible.
-  const sslConfig =
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : undefined;
-  const pool = new Pool({ connectionString, ssl: sslConfig });
+  // Supabase's root CA is not in Node's default trust store. Bundling it here
+  // enables full chain verification without disabling TLS checks.
+  const ca = readFileSync(
+    join(process.cwd(), "certs/supabase-root-ca.pem")
+  ).toString();
+  const pool = new Pool({ connectionString, ssl: { ca } });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({
     adapter,
