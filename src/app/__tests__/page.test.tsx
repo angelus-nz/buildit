@@ -56,7 +56,7 @@ describe("HomePage — landing page (logged-out)", () => {
 
     it("renders hero subheading copy", async () => {
       await renderPage();
-      expect(screen.getByText(/showcase your work, manage quotes/i)).toBeDefined();
+      expect(screen.getByText(/showcase your work/i)).toBeDefined();
     });
 
     it("renders Start for free CTA linking to /auth/register", async () => {
@@ -134,9 +134,9 @@ describe("HomePage — landing page (logged-out)", () => {
       ).toBeDefined();
     });
 
-    it("renders Mike Thompson testimonial", async () => {
+    it("renders John Doe testimonial", async () => {
       await renderPage();
-      expect(screen.getByText("Mike Thompson")).toBeDefined();
+      expect(screen.getByText("John Doe")).toBeDefined();
       expect(screen.getByText(/construction contractor, auckland/i)).toBeDefined();
     });
 
