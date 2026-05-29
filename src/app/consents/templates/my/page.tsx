@@ -61,7 +61,7 @@ function TemplateCard({
   const filledFields = Object.entries(template.formData).filter(([, v]) => v);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -73,26 +73,26 @@ function TemplateCard({
                   onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && void save()}
                   autoFocus
-                  className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-1.5 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
                 <button
                   onClick={() => void save()}
                   disabled={saving || !name.trim()}
-                  className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="text-xs bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-amber-600 disabled:opacity-50"
                 >
                   {saving ? "…" : "Save"}
                 </button>
                 <button
                   onClick={() => { setName(template.name); setEditing(false); }}
-                  className="text-xs text-gray-400 hover:text-gray-600"
+                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   Cancel
                 </button>
               </div>
             ) : (
-              <h3 className="font-medium text-gray-900 truncate">{template.name}</h3>
+              <h3 className="font-medium text-slate-900 dark:text-slate-50 truncate">{template.name}</h3>
             )}
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
               {template.consentTypeId
                 ? (consentTypeNameMap[template.consentTypeId] ?? template.consentTypeId)
                 : "All consent types"}
@@ -103,13 +103,13 @@ function TemplateCard({
           <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => setEditing(true)}
-              className="text-xs text-gray-400 hover:text-blue-600 px-2 py-1 rounded hover:bg-gray-50"
+              className="text-xs text-slate-400 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 px-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700"
             >
               Rename
             </button>
             <button
               onClick={() => onDelete(template.id)}
-              className="text-xs text-gray-400 hover:text-red-500 px-2 py-1 rounded hover:bg-gray-50"
+              className="text-xs text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 px-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700"
             >
               Delete
             </button>
@@ -119,7 +119,7 @@ function TemplateCard({
         {filledFields.length > 0 && (
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="mt-3 text-xs text-blue-600 hover:underline"
+            className="mt-3 text-xs text-amber-600 dark:text-amber-400 hover:underline"
           >
             {expanded ? "Hide fields ▲" : `Show ${filledFields.length} saved field${filledFields.length !== 1 ? "s" : ""} ▼`}
           </button>
@@ -127,12 +127,12 @@ function TemplateCard({
       </div>
 
       {expanded && filledFields.length > 0 && (
-        <div className="border-t border-gray-100 px-5 pb-5 pt-4">
+        <div className="border-t border-slate-100 dark:border-slate-700 px-5 pb-5 pt-4">
           <dl className="grid gap-2 sm:grid-cols-2">
             {filledFields.map(([k, v]) => (
               <div key={k}>
-                <dt className="text-xs text-gray-400">{k}</dt>
-                <dd className="text-sm text-gray-700 truncate">{v}</dd>
+                <dt className="text-xs text-slate-400 dark:text-slate-500">{k}</dt>
+                <dd className="text-sm text-slate-700 dark:text-slate-300 truncate">{v}</dd>
               </div>
             ))}
           </dl>
@@ -175,15 +175,15 @@ export default function MyTemplatesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold text-gray-900">BuildIt</Link>
+          <Link href="/" className="text-lg font-semibold text-slate-900 dark:text-slate-50">BuildIt</Link>
           <nav className="flex items-center gap-6 text-sm">
-            <Link href="/consents/tracker" className="text-gray-600 hover:text-gray-900">
+            <Link href="/consents/tracker" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50">
               My Applications
             </Link>
-            <Link href="/consents/tracker/new" className="text-blue-600 font-medium hover:underline">
+            <Link href="/consents/tracker/new" className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
               + New application
             </Link>
           </nav>
@@ -191,7 +191,7 @@ export default function MyTemplatesPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6">
           <Link href="/consents" className="hover:underline">Council Consents</Link>
           <span>/</span>
           <span>My Templates</span>
@@ -199,32 +199,32 @@ export default function MyTemplatesPage() {
 
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">My application templates</h1>
-            <p className="text-gray-500 text-sm max-w-xl">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-1">My application templates</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl">
               Templates store your common details so you can auto-fill future consent applications in one click.
               Create a template the next time you fill out an application.
             </p>
           </div>
           <Link
             href="/consents/tracker/new"
-            className="bg-blue-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-blue-700 transition whitespace-nowrap shrink-0"
+            className="bg-amber-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-amber-600 transition whitespace-nowrap shrink-0"
           >
             + New application
           </Link>
         </div>
 
         {loading ? (
-          <div className="text-sm text-gray-400 py-12 text-center">Loading…</div>
+          <div className="text-sm text-slate-400 dark:text-slate-500 py-12 text-center">Loading…</div>
         ) : templates.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <p className="text-gray-500 text-sm mb-2">No templates saved yet.</p>
-            <p className="text-gray-400 text-xs mb-6 max-w-sm mx-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-12 text-center shadow-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">No templates saved yet.</p>
+            <p className="text-slate-400 dark:text-slate-500 text-xs mb-6 max-w-sm mx-auto">
               When filling out a new application, tick &ldquo;Save these details as a reusable
               template&rdquo; to auto-fill next time.
             </p>
             <Link
               href="/consents/tracker/new"
-              className="text-sm text-blue-600 font-medium hover:underline"
+              className="text-sm text-amber-600 dark:text-amber-400 font-medium hover:underline"
             >
               Start a new application →
             </Link>
@@ -245,21 +245,21 @@ export default function MyTemplatesPage() {
 
       {deleteId && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-xl p-6 max-w-sm w-full">
-            <h2 className="text-base font-semibold text-gray-900 mb-2">Delete template?</h2>
-            <p className="text-sm text-gray-500 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl p-6 max-w-sm w-full">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-50 mb-2">Delete template?</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
               This will permanently delete the template. Existing applications are unaffected.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => void confirmDelete(deleteId)}
-                className="bg-red-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-red-700 transition"
+                className="bg-red-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-red-700 transition"
               >
                 Delete
               </button>
               <button
                 onClick={() => setDeleteId(null)}
-                className="text-sm text-gray-500 px-5 py-2.5 rounded-lg hover:bg-gray-100 transition"
+                className="text-sm text-slate-500 dark:text-slate-400 px-5 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition"
               >
                 Cancel
               </button>
