@@ -1,17 +1,63 @@
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { NavUnreadBadge } from "./NavUnreadBadge";
+
+function MetricCard({
+  label,
+  value,
+  href,
+  accentClass,
+}: {
+  label: string;
+  value: number;
+  href: string;
+  accentClass: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex cursor-pointer flex-col gap-1 rounded-xl border border-slate-200 bg-white p-5 transition-all hover:border-amber-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-amber-600"
+    >
+      <span className={`text-3xl font-bold ${accentClass}`}>{value}</span>
+      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{label}</span>
+    </Link>
+  );
+}
+
+function QuickAction({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all hover:border-amber-400 hover:text-amber-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-amber-500 dark:hover:text-amber-400"
+    >
+      {label}
+    </Link>
+  );
+}
+
+function StatusBadge({ published }: { published: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+        published
+          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+          : "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+      }`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${published ? "bg-emerald-500" : "bg-amber-500"}`} />
+      {published ? "Published" : "Draft"}
+    </span>
+  );
+}
 
 export default async function DashboardPage() {
   const session = await auth();
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  if (!session) redirect("/auth/signin");
 
   const isTradesman = session.user.role === "TRADESMAN";
+  const firstName = session.user.name?.split(" ")[0] ?? "there";
+
   const business = isTradesman
     ? await prisma.business.findUnique({
         where: { userId: session.user.id },
@@ -19,244 +65,161 @@ export default async function DashboardPage() {
       })
     : null;
 
-  const pendingInquiries =
+  if (isTradesman && !business) redirect("/profile/onboard");
+
+  const [pendingInquiries, activeQuotes, unpaidInvoices] = await Promise.all([
     business
-      ? await prisma.inquiry.count({ where: { businessId: business.id, status: "PENDING" } })
-      : 0;
-
-  const activeQuotes = business
-    ? await prisma.quote.count({
-        where: { businessId: business.id, status: { in: ["DRAFT", "SENT", "ACCEPTED"] } },
-      })
-    : 0;
-
-  const unpaidInvoices = business
-    ? await prisma.invoice.count({
-        where: { businessId: business.id, status: { in: ["DRAFT", "SENT", "OVERDUE"] } },
-      })
-    : 0;
-
-  const unreadMessages = await (async () => {
-    const participants = await prisma.conversationParticipant.findMany({
-      where: { userId: session.user.id },
-      select: {
-        lastReadAt: true,
-        conversation: {
-          select: {
-            messages: {
-              where: { senderId: { not: session.user.id } },
-              orderBy: { createdAt: "desc" },
-              take: 1,
-              select: { createdAt: true },
-            },
-          },
-        },
-      },
-    });
-    return participants.filter((p) => {
-      const last = p.conversation.messages[0];
-      return last && new Date(last.createdAt) > new Date(p.lastReadAt);
-    }).length;
-  })();
-
-  if (isTradesman && !business) {
-    redirect("/profile/onboard");
-  }
+      ? prisma.inquiry.count({ where: { businessId: business.id, status: "PENDING" } })
+      : Promise.resolve(0),
+    business
+      ? prisma.quote.count({
+          where: { businessId: business.id, status: { in: ["DRAFT", "SENT", "ACCEPTED"] } },
+        })
+      : Promise.resolve(0),
+    business
+      ? prisma.invoice.count({
+          where: { businessId: business.id, status: { in: ["DRAFT", "SENT", "OVERDUE"] } },
+        })
+      : Promise.resolve(0),
+  ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-gray-900">BuildIt</h1>
-        <div className="flex items-center gap-4">
-          <NavUnreadBadge />
-          <span className="text-sm text-gray-600">
-            {session.user.name ?? session.user.email}
-          </span>
-          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
-            {session.user.role}
-          </span>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <button type="submit" className="text-sm text-gray-500 hover:text-gray-700">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome, {session.user.name?.split(" ")[0] ?? "there"}!
-        </h2>
+    <div className="mx-auto max-w-5xl px-6 py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          Welcome back, {firstName}
+        </h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          {isTradesman && business
+            ? `Here's what's happening with ${business.name} today.`
+            : "Here's your BuildIt overview."}
+        </p>
+      </div>
 
-        {isTradesman && business && (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-1">Your profile</h3>
-              <p className="text-gray-900 font-medium">{business.name}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                {business.isPublished ? "✅ Published — visible to customers" : "⚠️ Draft — not yet visible"}
-              </p>
-              <div className="flex gap-3 mt-4">
+      {isTradesman && business && (
+        <>
+          <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <MetricCard
+              label="Active quotes"
+              value={activeQuotes}
+              href="/dashboard/quotes"
+              accentClass="text-amber-600 dark:text-amber-400"
+            />
+            <MetricCard
+              label="Unpaid invoices"
+              value={unpaidInvoices}
+              href="/dashboard/invoices"
+              accentClass="text-orange-600 dark:text-orange-400"
+            />
+            <MetricCard
+              label="New inquiries"
+              value={pendingInquiries}
+              href="/dashboard/inbox"
+              accentClass="text-blue-600 dark:text-blue-400"
+            />
+          </div>
+
+          <div className="mb-8">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Quick actions
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <QuickAction href="/dashboard/quotes/new" label="+ New quote" />
+              <QuickAction href="/dashboard/projects/new" label="+ New project" />
+              <QuickAction href="/consents/tracker/new" label="+ New consent" />
+              {business.isPublished && (
+                <QuickAction href={`/tradesmen/${business.slug}`} label="View public profile" />
+              )}
+            </div>
+          </div>
+
+          <section className="mb-6">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Your business
+            </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-semibold text-slate-900 dark:text-white">{business.name}</h2>
+                  <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                    buildit.angelus.nz/tradesmen/{business.slug}
+                  </p>
+                </div>
+                <StatusBadge published={business.isPublished} />
+              </div>
+              <div className="mt-4 flex gap-3">
                 <Link
                   href="/profile/edit"
-                  className="text-sm text-blue-600 font-medium hover:underline"
+                  className="cursor-pointer text-sm font-medium text-amber-600 transition-colors hover:text-amber-700 dark:text-amber-400"
                 >
                   Edit profile
                 </Link>
                 {business.isPublished && (
                   <Link
                     href={`/tradesmen/${business.slug}`}
-                    className="text-sm text-gray-500 hover:underline"
+                    className="cursor-pointer text-sm text-slate-500 transition-colors hover:text-slate-900 dark:hover:text-white"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    View public page
+                    View public page &rarr;
                   </Link>
                 )}
               </div>
             </div>
+          </section>
+        </>
+      )}
 
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-1">Projects</h3>
-              <p className="text-xs text-gray-500 mt-1">
-                Showcase your work in progress and completed jobs.
-              </p>
-              <div className="flex gap-3 mt-4">
-                <Link
-                  href="/dashboard/projects"
-                  className="text-sm text-blue-600 font-medium hover:underline"
-                >
-                  Manage projects
-                </Link>
-                <Link href="/dashboard/projects/new" className="text-sm text-gray-500 hover:underline">
-                  + New project
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-semibold text-gray-700">Inbox</h3>
-                {pendingInquiries > 0 && (
-                  <span className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
-                    {pendingInquiries} new
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                View and reply to customer inquiries.
-              </p>
-              <div className="mt-4">
-                <Link
-                  href="/dashboard/inbox"
-                  className="text-sm text-blue-600 font-medium hover:underline"
-                >
-                  Open inbox
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-semibold text-gray-700">Quotes</h3>
-                {activeQuotes > 0 && (
-                  <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                    {activeQuotes} active
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Send quotes to customers and track their status.
-              </p>
-              <div className="flex gap-3 mt-4">
-                <Link
-                  href="/dashboard/quotes"
-                  className="text-sm text-blue-600 font-medium hover:underline"
-                >
-                  Manage quotes
-                </Link>
-                <Link href="/dashboard/quotes/new" className="text-sm text-gray-500 hover:underline">
-                  + New quote
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-semibold text-gray-700">Invoices</h3>
-                {unpaidInvoices > 0 && (
-                  <span className="text-xs font-medium bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full">
-                    {unpaidInvoices} unpaid
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Track and mark invoices as paid.
-              </p>
-              <div className="mt-4">
-                <Link
-                  href="/dashboard/invoices"
-                  className="text-sm text-blue-600 font-medium hover:underline"
-                >
-                  Manage invoices
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Messages — available to all users */}
-        <div className={isTradesman ? "mt-0" : "mt-6"}>
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-semibold text-gray-700">Messages</h3>
-              {unreadMessages > 0 && (
-                <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                  {unreadMessages} unread
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Direct messages with {isTradesman ? "customers" : "tradespeople"}.
-            </p>
-            <div className="mt-4">
-              <Link href="/messages" className="text-sm text-blue-600 font-medium hover:underline">
-                Open messages
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Council consents — available to all users */}
-        <div className={isTradesman ? "mt-4" : "mt-6"}>
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Council consents</h3>
-            <p className="text-xs text-gray-500 mt-1">
-              Navigate NZ council consent processes in Nelson and Tasman. Find fees, required documents, and track applications to approval.
-            </p>
-            <div className="flex gap-3 mt-4">
-              <Link
-                href="/consents"
-                className="text-sm text-blue-600 font-medium hover:underline"
-              >
-                Consent types &amp; contacts
-              </Link>
-              <Link href="/consents/tracker" className="text-sm text-gray-500 hover:underline">
-                My applications
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {!isTradesman && (
-          <p className="text-gray-500 mt-4 text-sm">
-            More features coming soon.
+      <section className="mb-6">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          Council consents
+        </p>
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+          <h2 className="font-semibold text-slate-900 dark:text-white">NZ Council applications</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Navigate Nelson and Tasman council consent processes — fees, required documents, and application tracking.
           </p>
-        )}
-      </main>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/consents/tracker/new"
+              className="cursor-pointer rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+            >
+              Fill out a form
+            </Link>
+            <Link
+              href="/consents/tracker"
+              className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:border-amber-400 hover:text-amber-700 dark:border-slate-600 dark:text-slate-400"
+            >
+              My applications
+            </Link>
+            <Link
+              href="/consents/templates/my"
+              className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:border-amber-400 hover:text-amber-700 dark:border-slate-600 dark:text-slate-400"
+            >
+              My templates
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {!isTradesman && (
+        <section>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Find a tradesman
+          </p>
+          <div className="rounded-xl border border-slate-200 bg-white p-5 text-center dark:border-slate-700 dark:bg-slate-800">
+            <p className="text-slate-600 dark:text-slate-400">
+              Browse our directory to find skilled tradesmen near you.
+            </p>
+            <Link
+              href="/find"
+              className="mt-4 inline-block cursor-pointer rounded-lg bg-amber-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+            >
+              Browse tradesmen
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
