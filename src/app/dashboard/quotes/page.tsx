@@ -13,11 +13,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-gray-50 text-gray-600 border-gray-200",
-  SENT: "bg-blue-50 text-blue-700 border-blue-200",
-  ACCEPTED: "bg-green-50 text-green-700 border-green-200",
-  DECLINED: "bg-red-50 text-red-600 border-red-200",
-  EXPIRED: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  DRAFT: "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600",
+  SENT: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
+  ACCEPTED: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800",
+  DECLINED: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
+  EXPIRED: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800",
 };
 
 export default async function QuotesPage() {
@@ -40,73 +40,70 @@ export default async function QuotesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <Link href="/dashboard" className="text-lg font-semibold text-gray-900 hover:opacity-80">
-          BuildIt
+    <div className="mx-auto max-w-3xl px-6 py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Quotes</h1>
+        <Link
+          href="/dashboard/quotes/new"
+          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-600"
+        >
+          + New quote
         </Link>
-        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">
-          ← Dashboard
-        </Link>
-      </header>
+      </div>
 
-      <main className="max-w-3xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Quotes</h1>
+      {quotes.length === 0 && (
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center dark:border-slate-700 dark:bg-slate-800">
+          <p className="mb-4 text-sm text-slate-400">No quotes yet.</p>
           <Link
             href="/dashboard/quotes/new"
-            className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="text-sm font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400"
           >
-            + New quote
+            Create your first quote →
           </Link>
         </div>
+      )}
 
-        {quotes.length === 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <p className="text-gray-400 text-sm mb-4">No quotes yet.</p>
-            <Link href="/dashboard/quotes/new" className="text-blue-600 text-sm font-medium hover:underline">
-              Create your first quote →
-            </Link>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          {quotes.map((quote) => (
-            <div key={quote.id} className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h2 className="font-medium text-gray-900 text-sm truncate">{quote.title}</h2>
-                    <span
-                      className={`text-xs font-medium px-2 py-0.5 rounded-full border shrink-0 ${STATUS_COLORS[quote.status]}`}
-                    >
-                      {STATUS_LABELS[quote.status]}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {quote.customer.name ?? quote.customer.email} ·{" "}
-                    ${(quote.amountCents / 100).toFixed(2)} {quote.currency}
-                  </p>
-                  {quote.expiresAt && (
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Expires {new Date(quote.expiresAt).toLocaleDateString()}
-                    </p>
-                  )}
-                  {quote.invoice && (
-                    <p className="text-xs text-green-600 mt-0.5">
-                      Invoice created ·{" "}
-                      <Link href="/dashboard/invoices" className="underline">
-                        View invoice
-                      </Link>
-                    </p>
-                  )}
+      <div className="space-y-3">
+        {quotes.map((quote) => (
+          <div
+            key={quote.id}
+            className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1 flex items-center gap-2">
+                  <h2 className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                    {quote.title}
+                  </h2>
+                  <span
+                    className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[quote.status]}`}
+                  >
+                    {STATUS_LABELS[quote.status]}
+                  </span>
                 </div>
-                <QuoteActions quote={quote} />
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {quote.customer.name ?? quote.customer.email} ·{" "}
+                  ${(quote.amountCents / 100).toFixed(2)} {quote.currency}
+                </p>
+                {quote.expiresAt && (
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    Expires {new Date(quote.expiresAt).toLocaleDateString()}
+                  </p>
+                )}
+                {quote.invoice && (
+                  <p className="mt-0.5 text-xs text-emerald-600 dark:text-emerald-400">
+                    Invoice created ·{" "}
+                    <Link href="/dashboard/invoices" className="underline">
+                      View invoice
+                    </Link>
+                  </p>
+                )}
               </div>
+              <QuoteActions quote={quote} />
             </div>
-          ))}
-        </div>
-      </main>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -13,11 +13,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-gray-50 text-gray-600 border-gray-200",
-  SENT: "bg-blue-50 text-blue-700 border-blue-200",
-  PAID: "bg-green-50 text-green-700 border-green-200",
-  OVERDUE: "bg-red-50 text-red-600 border-red-200",
-  CANCELLED: "bg-gray-50 text-gray-400 border-gray-200",
+  DRAFT: "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600",
+  SENT: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
+  PAID: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800",
+  OVERDUE: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
+  CANCELLED: "bg-slate-50 text-slate-400 border-slate-200 dark:bg-slate-700 dark:text-slate-500 dark:border-slate-600",
 };
 
 export default async function InvoicesPage() {
@@ -41,71 +41,73 @@ export default async function InvoicesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <Link href="/dashboard" className="text-lg font-semibold text-gray-900 hover:opacity-80">
-          BuildIt
+    <div className="mx-auto max-w-3xl px-6 py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Invoices</h1>
+        <Link
+          href="/dashboard/quotes"
+          className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+        >
+          Manage quotes →
         </Link>
-        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700">
-          ← Dashboard
-        </Link>
-      </header>
+      </div>
 
-      <main className="max-w-3xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-gray-900">Invoices</h1>
-          <Link href="/dashboard/quotes" className="text-sm text-gray-500 hover:text-gray-700">
-            Manage quotes →
-          </Link>
+      {invoices.length === 0 && (
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center dark:border-slate-700 dark:bg-slate-800">
+          <p className="mb-2 text-sm text-slate-400">No invoices yet.</p>
+          <p className="text-xs text-slate-400">
+            Invoices are created by converting an accepted quote.{" "}
+            <Link
+              href="/dashboard/quotes"
+              className="font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400"
+            >
+              Go to quotes →
+            </Link>
+          </p>
         </div>
+      )}
 
-        {invoices.length === 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <p className="text-gray-400 text-sm mb-4">No invoices yet.</p>
-            <p className="text-xs text-gray-400">
-              Invoices are created by converting an accepted quote.{" "}
-              <Link href="/dashboard/quotes" className="text-blue-600 hover:underline">
-                Go to quotes →
-              </Link>
-            </p>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          {invoices.map((invoice) => {
-            const customer = invoice.quote?.customer;
-            return (
-              <div key={invoice.id} className="bg-white rounded-xl border border-gray-200 p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h2 className="font-medium text-gray-900 text-sm truncate">{invoice.title}</h2>
-                      <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded-full border shrink-0 ${STATUS_COLORS[invoice.status]}`}
-                      >
-                        {STATUS_LABELS[invoice.status]}
-                      </span>
-                    </div>
-                    {customer && (
-                      <p className="text-xs text-gray-500">{customer.name ?? customer.email}</p>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      ${(invoice.amountCents / 100).toFixed(2)} {invoice.currency}
-                      {invoice.dueAt && <> · Due {new Date(invoice.dueAt).toLocaleDateString()}</>}
-                    </p>
-                    {invoice.paidAt && (
-                      <p className="text-xs text-green-600 mt-0.5">
-                        Paid {new Date(invoice.paidAt).toLocaleDateString()}
-                      </p>
-                    )}
+      <div className="space-y-3">
+        {invoices.map((invoice) => {
+          const customer = invoice.quote?.customer;
+          return (
+            <div
+              key={invoice.id}
+              className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <h2 className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                      {invoice.title}
+                    </h2>
+                    <span
+                      className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[invoice.status]}`}
+                    >
+                      {STATUS_LABELS[invoice.status]}
+                    </span>
                   </div>
-                  <InvoiceActions invoice={invoice} />
+                  {customer && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {customer.name ?? customer.email}
+                    </p>
+                  )}
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    ${(invoice.amountCents / 100).toFixed(2)} {invoice.currency}
+                    {invoice.dueAt && <> · Due {new Date(invoice.dueAt).toLocaleDateString()}</>}
+                  </p>
+                  {invoice.paidAt && (
+                    <p className="mt-0.5 text-xs text-emerald-600 dark:text-emerald-400">
+                      Paid {new Date(invoice.paidAt).toLocaleDateString()}
+                    </p>
+                  )}
                 </div>
+                <InvoiceActions invoice={invoice} />
               </div>
-            );
-          })}
-        </div>
-      </main>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
