@@ -102,6 +102,23 @@ export default function DashboardPage() {
               </Link>
             </CardContent>
           </Card>
+
+          <Card className="border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/10">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-semibold bg-amber-500 text-white px-2 py-0.5 rounded-full">Free plan</span>
+              </div>
+              <CardTitle className="text-base font-semibold">Upgrade to Pro</CardTitle>
+              <CardDescription className="text-xs">Unlock unlimited projects, council consents, and priority marketplace placement.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/pricing">
+                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold">
+                  See pricing →
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -28,6 +28,9 @@ export default async function HomePage() {
             <a href="#testimonials" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors">
               Testimonials
             </a>
+            <Link href="/pricing" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors">
+              Pricing
+            </Link>
             {isLoggedIn ? (
               <Link href="/dashboard">
                 <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white">
