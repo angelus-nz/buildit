@@ -1,12 +1,13 @@
 /*
  * Design Tokens for BuildIt
- * 
+ *
  * Primary: slate-900 / slate-50 (neutral base)
  * Accent CTA: amber-500 / amber-600 (#F59E0B / #D97706)
  * Typography: Inter for body, Inter (or Geist) for headings
  * Touch targets >= 44px
  */
 
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
