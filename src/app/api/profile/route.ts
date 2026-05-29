@@ -15,6 +15,11 @@ const updateSchema = z.object({
   state: z.string().max(100).optional(),
   country: z.string().length(2).optional(),
   isPublished: z.boolean().optional(),
+  // Trust signals
+  lbpNumber: z.string().max(50).optional().or(z.literal("")),
+  nzbn: z.string().max(13).optional().or(z.literal("")),
+  insuranceCarrier: z.string().max(100).optional().or(z.literal("")),
+  insuranceExpiry: z.string().datetime({ offset: true }).optional().or(z.literal("")),
 });
 
 export async function GET() {
@@ -54,8 +59,10 @@ export async function PUT(req: Request) {
     );
   }
 
-  const { businessName, category, bio, phone, website, suburb, city, state, country, isPublished } =
-    parsed.data;
+  const {
+    businessName, category, bio, phone, website, suburb, city, state, country, isPublished,
+    lbpNumber, nzbn, insuranceCarrier, insuranceExpiry,
+  } = parsed.data;
 
   const business = await prisma.business.update({
     where: { id: existing.id },
@@ -70,6 +77,12 @@ export async function PUT(req: Request) {
       ...(state !== undefined && { state }),
       ...(country !== undefined && { country }),
       ...(isPublished !== undefined && { isPublished }),
+      ...(lbpNumber !== undefined && { lbpNumber: lbpNumber || null }),
+      ...(nzbn !== undefined && { nzbn: nzbn || null }),
+      ...(insuranceCarrier !== undefined && { insuranceCarrier: insuranceCarrier || null }),
+      ...(insuranceExpiry !== undefined && {
+        insuranceExpiry: insuranceExpiry ? new Date(insuranceExpiry) : null,
+      }),
     },
   });
 

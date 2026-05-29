@@ -8,6 +8,28 @@ import { StartConversationButton } from "./StartConversationButton";
 import ReviewsSection from "./ReviewsSection";
 import type { Metadata } from "next";
 
+interface TrustBadgeProps {
+  icon: string;
+  label: string;
+  value: string;
+  verified: boolean;
+}
+
+function TrustBadge({ icon, label, value, verified }: TrustBadgeProps) {
+  return (
+    <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm">
+      <span>{icon}</span>
+      <span className="text-slate-500 dark:text-slate-400 text-xs font-medium">{label}:</span>
+      <span className="text-slate-800 dark:text-slate-200 font-medium">{value}</span>
+      {verified && (
+        <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold ml-0.5" title="Verified by BuildIt">
+          ✓
+        </span>
+      )}
+    </div>
+  );
+}
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
@@ -35,6 +57,7 @@ export default async function TradesmanProfilePage({ params }: Props) {
     where: { slug, isPublished: true },
     include: {
       user: { select: { name: true } },
+      certifications: { orderBy: { createdAt: "asc" } },
       reviews: {
         orderBy: { createdAt: "desc" },
         include: { author: { select: { name: true, image: true } } },
@@ -131,6 +154,54 @@ export default async function TradesmanProfilePage({ params }: Props) {
                   🌐 Website
                 </a>
               )}
+            </div>
+          )}
+
+          {/* Trust signals */}
+          {(business.lbpNumber || business.nzbn || business.insuranceCarrier || business.certifications.length > 0) && (
+            <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+                Credentials & Trust
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {business.lbpNumber && (
+                  <TrustBadge
+                    icon="🏛️"
+                    label="LBP"
+                    value={business.lbpNumber}
+                    verified={business.trustVerificationStatus === "VERIFIED"}
+                  />
+                )}
+                {business.nzbn && (
+                  <TrustBadge
+                    icon="🏢"
+                    label="NZBN"
+                    value={business.nzbn}
+                    verified={business.trustVerificationStatus === "VERIFIED"}
+                  />
+                )}
+                {business.insuranceCarrier && (
+                  <TrustBadge
+                    icon="🛡️"
+                    label="Public liability"
+                    value={
+                      business.insuranceExpiry
+                        ? `${business.insuranceCarrier} · exp ${new Date(business.insuranceExpiry).toLocaleDateString("en-NZ", { month: "short", year: "numeric" })}`
+                        : business.insuranceCarrier
+                    }
+                    verified={business.trustVerificationStatus === "VERIFIED"}
+                  />
+                )}
+                {business.certifications.map((cert) => (
+                  <TrustBadge
+                    key={cert.id}
+                    icon="✅"
+                    label={cert.issuingBody ?? "Certification"}
+                    value={cert.name}
+                    verified={cert.verificationStatus === "VERIFIED"}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </section>

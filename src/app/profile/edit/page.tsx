@@ -13,6 +13,7 @@ export default async function ProfileEditPage({
 
   const business = await prisma.business.findUnique({
     where: { userId: session.user.id },
+    include: { certifications: { orderBy: { createdAt: "asc" } } },
   });
 
   if (!business) redirect("/profile/onboard");
@@ -37,7 +38,7 @@ export default async function ProfileEditPage({
           View public profile →
         </a>
       </div>
-      <ProfileEditForm business={business} />
+      <ProfileEditForm business={business} initialCertifications={business.certifications} />
     </div>
   );
 }

@@ -2,14 +2,15 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { type Business } from "@prisma/client";
+import { type Business, type Certification } from "@prisma/client";
 import { CATEGORY_OPTIONS } from "@/lib/categories";
 
 interface Props {
   business: Business;
+  initialCertifications: Certification[];
 }
 
-export default function ProfileEditForm({ business }: Props) {
+export default function ProfileEditForm({ business, initialCertifications }: Props) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +24,18 @@ export default function ProfileEditForm({ business }: Props) {
     city: business.city ?? "",
     state: business.state ?? "",
     isPublished: business.isPublished,
+    lbpNumber: business.lbpNumber ?? "",
+    nzbn: business.nzbn ?? "",
+    insuranceCarrier: business.insuranceCarrier ?? "",
+    insuranceExpiry: business.insuranceExpiry
+      ? new Date(business.insuranceExpiry).toISOString().slice(0, 10)
+      : "",
   });
+
+  const [certifications, setCertifications] = useState<Certification[]>(initialCertifications);
+  const [newCert, setNewCert] = useState({ name: "", issuingBody: "", certNumber: "", expiresAt: "" });
+  const [addingCert, setAddingCert] = useState(false);
+  const [certError, setCertError] = useState<string | null>(null);
 
   const [logoUrl, setLogoUrl] = useState<string | null>(business.logoUrl);
   const [saving, setSaving] = useState(false);
@@ -59,6 +71,41 @@ export default function ProfileEditForm({ business }: Props) {
     setLogoUrl(data.url);
   }
 
+  async function handleAddCert(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newCert.name.trim()) return;
+    setAddingCert(true);
+    setCertError(null);
+
+    const res = await fetch("/api/profile/certifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: newCert.name.trim(),
+        issuingBody: newCert.issuingBody.trim() || undefined,
+        certNumber: newCert.certNumber.trim() || undefined,
+        expiresAt: newCert.expiresAt ? new Date(newCert.expiresAt).toISOString() : undefined,
+      }),
+    });
+
+    setAddingCert(false);
+
+    if (!res.ok) {
+      const data = await res.json();
+      setCertError(data.error ?? "Failed to add certification");
+      return;
+    }
+
+    const data = await res.json();
+    setCertifications((prev) => [...prev, data.certification]);
+    setNewCert({ name: "", issuingBody: "", certNumber: "", expiresAt: "" });
+  }
+
+  async function handleDeleteCert(id: string) {
+    await fetch(`/api/profile/certifications/${id}`, { method: "DELETE" });
+    setCertifications((prev) => prev.filter((c) => c.id !== id));
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -78,6 +125,12 @@ export default function ProfileEditForm({ business }: Props) {
         city: form.city || undefined,
         state: form.state || undefined,
         isPublished: form.isPublished,
+        lbpNumber: form.lbpNumber || undefined,
+        nzbn: form.nzbn || undefined,
+        insuranceCarrier: form.insuranceCarrier || undefined,
+        insuranceExpiry: form.insuranceExpiry
+          ? new Date(form.insuranceExpiry).toISOString()
+          : undefined,
       }),
     });
 
@@ -227,6 +280,146 @@ export default function ProfileEditForm({ business }: Props) {
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+        </div>
+      </section>
+
+      {/* Trust & Credentials */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div>
+          <h3 className="text-base font-semibold text-gray-900">Trust & credentials</h3>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Customers are more likely to hire tradesmen with visible verification. All fields optional.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">LBP number</label>
+            <input
+              type="text"
+              value={form.lbpNumber}
+              onChange={(e) => set("lbpNumber", e.target.value)}
+              maxLength={50}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="LBP 012345"
+            />
+            <p className="text-xs text-gray-400 mt-1">Licensed Building Practitioner</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">NZBN</label>
+            <input
+              type="text"
+              value={form.nzbn}
+              onChange={(e) => set("nzbn", e.target.value)}
+              maxLength={13}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="9429000000000"
+            />
+            <p className="text-xs text-gray-400 mt-1">NZ Business Number</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Insurance provider</label>
+            <input
+              type="text"
+              value={form.insuranceCarrier}
+              onChange={(e) => set("insuranceCarrier", e.target.value)}
+              maxLength={100}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="NZI, AMI, Vero…"
+            />
+            <p className="text-xs text-gray-400 mt-1">Public liability insurer</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Insurance expiry</label>
+            <input
+              type="date"
+              value={form.insuranceExpiry}
+              onChange={(e) => set("insuranceExpiry", e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Certifications */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Certifications</label>
+          {certifications.length > 0 && (
+            <ul className="space-y-2 mb-3">
+              {certifications.map((cert) => (
+                <li
+                  key={cert.id}
+                  className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm"
+                >
+                  <div>
+                    <span className="font-medium text-gray-800">{cert.name}</span>
+                    {cert.issuingBody && (
+                      <span className="text-gray-500 ml-1">· {cert.issuingBody}</span>
+                    )}
+                    {cert.certNumber && (
+                      <span className="text-gray-400 ml-1 text-xs">#{cert.certNumber}</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteCert(cert.id)}
+                    className="text-gray-400 hover:text-red-500 transition-colors ml-2 text-xs"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <form onSubmit={handleAddCert} className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                value={newCert.name}
+                onChange={(e) => setNewCert((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder="Certification name *"
+                maxLength={100}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <input
+                type="text"
+                value={newCert.issuingBody}
+                onChange={(e) => setNewCert((prev) => ({ ...prev, issuingBody: e.target.value }))}
+                placeholder="Issuing body"
+                maxLength={100}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                value={newCert.certNumber}
+                onChange={(e) => setNewCert((prev) => ({ ...prev, certNumber: e.target.value }))}
+                placeholder="Certificate number"
+                maxLength={50}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <input
+                type="date"
+                value={newCert.expiresAt}
+                onChange={(e) => setNewCert((prev) => ({ ...prev, expiresAt: e.target.value }))}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            {certError && (
+              <p className="text-xs text-red-600">{certError}</p>
+            )}
+            <button
+              type="submit"
+              disabled={addingCert || !newCert.name.trim()}
+              className="text-sm border border-gray-300 text-gray-700 rounded-lg px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              {addingCert ? "Adding…" : "+ Add certification"}
+            </button>
+          </form>
         </div>
       </section>
 
