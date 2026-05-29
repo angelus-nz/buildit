@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run db:generate && npm run build",
+  "buildCommand": "npx prisma migrate deploy && npm run db:generate && npm run build",
   "installCommand": "npm ci",
   "regions": ["syd1"]
 }
