@@ -9,24 +9,16 @@ vi.mock("next/link", () => ({
 }));
 
 describe("DashboardPage", () => {
-  describe("Navigation", () => {
-    it("renders BuildIt brand in header", () => {
+  describe("Page heading", () => {
+    it("renders Dashboard heading", () => {
       render(<DashboardPage />);
-      expect(screen.getAllByText("BuildIt").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByRole("heading", { name: /dashboard/i })).toBeDefined();
     });
 
-    it("renders Dashboard nav link", () => {
+    it("renders New Project CTA linking to /dashboard/projects/new", () => {
       render(<DashboardPage />);
-      expect(
-        screen.getByRole("link", { name: "Dashboard" })
-      ).toHaveAttribute("href", "/dashboard");
-    });
-
-    it("renders Create Project CTA linking to /projects/new", () => {
-      render(<DashboardPage />);
-      expect(
-        screen.getByRole("link", { name: /create project/i })
-      ).toHaveAttribute("href", "/projects/new");
+      const link = screen.getByRole("link", { name: /new project/i });
+      expect(link).toHaveAttribute("href", "/dashboard/projects/new");
     });
   });
 
@@ -36,25 +28,67 @@ describe("DashboardPage", () => {
       expect(screen.getByText("Active Projects")).toBeDefined();
     });
 
-    it("renders the page heading", () => {
+    it("renders Pending Quotes metric card", () => {
       render(<DashboardPage />);
-      expect(
-        screen.getByRole("heading", { name: /dashboard/i })
-      ).toBeDefined();
+      expect(screen.getByText("Pending Quotes")).toBeDefined();
+    });
+
+    it("renders Revenue metric card", () => {
+      render(<DashboardPage />);
+      expect(screen.getByText("Revenue (MTD)")).toBeDefined();
     });
   });
 
-  describe("Design system tokens", () => {
-    it("root element uses slate-50 background", () => {
-      const { container } = render(<DashboardPage />);
-      const root = container.firstElementChild as HTMLElement;
-      expect(root.className).toContain("bg-slate-50");
+  describe("Recent projects", () => {
+    it("renders View all link to /dashboard/projects", () => {
+      render(<DashboardPage />);
+      const link = screen.getByRole("link", { name: /view all/i });
+      expect(link).toHaveAttribute("href", "/dashboard/projects");
     });
 
-    it("header uses white background token", () => {
+    it("renders Kitchen Renovation project row", () => {
+      render(<DashboardPage />);
+      expect(screen.getByText("Kitchen Renovation")).toBeDefined();
+    });
+  });
+
+  describe("Quick actions — all links must work (US-3, US-4)", () => {
+    it("Create Project links to /dashboard/projects/new", () => {
+      render(<DashboardPage />);
+      const links = screen
+        .getAllByRole("link")
+        .filter((l) => l.getAttribute("href") === "/dashboard/projects/new");
+      expect(links.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("Edit Profile links to /profile/edit", () => {
+      render(<DashboardPage />);
+      const link = screen.getByRole("link", { name: /edit profile/i });
+      expect(link).toHaveAttribute("href", "/profile/edit");
+    });
+
+    it("Send Quote links to /dashboard/quotes/new", () => {
+      render(<DashboardPage />);
+      const link = screen.getByRole("link", { name: /send quote/i });
+      expect(link).toHaveAttribute("href", "/dashboard/quotes/new");
+    });
+
+    it("New Invoice links to /dashboard/invoices/new", () => {
+      render(<DashboardPage />);
+      const link = screen.getByRole("link", { name: /new invoice/i });
+      expect(link).toHaveAttribute("href", "/dashboard/invoices/new");
+    });
+  });
+
+  describe("Design tokens", () => {
+    it("renders white card backgrounds", () => {
       const { container } = render(<DashboardPage />);
-      const header = container.querySelector("header");
-      expect(header?.className).toContain("bg-white");
+      expect(container.innerHTML).toContain("bg-white");
+    });
+
+    it("uses amber accent for primary CTA", () => {
+      const { container } = render(<DashboardPage />);
+      expect(container.innerHTML).toContain("bg-amber-500");
     });
   });
 });

@@ -1,186 +1,109 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-50">
-      {/* Header */}
-      <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-amber-500 rounded-lg"></div>
-            <span className="text-xl font-bold">BuildIt</span>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-4">
-            <nav className="flex space-x-6">
-              <Link href="/dashboard" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 font-medium">
-                Dashboard
-              </Link>
-              <Link href="/projects" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 font-medium">
-                Projects
-              </Link>
-              <Link href="/quotes" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 font-medium">
-                Quotes
-              </Link>
-            </nav>
-            <Button variant="outline" className="h-10 px-4">
-              Profile
-            </Button>
-          </div>
-          
-          <div className="md:hidden">
-            <button className="text-slate-600 dark:text-slate-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Dashboard</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Your business at a glance</p>
         </div>
-      </header>
+        <Link href="/dashboard/projects/new">
+          <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+            + New Project
+          </Button>
+        </Link>
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <Link href="/projects/new">
-            <Button>Create Project</Button>
-          </Link>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardDescription>Active Projects</CardDescription>
-              <CardTitle className="text-3xl">12</CardTitle>
-            </CardHeader>
-          </Card>
-          
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardDescription>Pending Quotes</CardDescription>
-              <CardTitle className="text-3xl">5</CardTitle>
-            </CardHeader>
-          </Card>
-          
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardDescription>Upcoming Jobs</CardDescription>
-              <CardTitle className="text-3xl">3</CardTitle>
-            </CardHeader>
-          </Card>
-          
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardDescription>Total Revenue</CardDescription>
-              <CardTitle className="text-3xl">$12,450</CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* Projects Overview */}
-        <Card className="border border-slate-200 dark:border-slate-800 mb-8">
-          <CardHeader>
-            <CardTitle>Recent Projects</CardTitle>
-            <CardDescription>Latest updates from your projects</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800">
-                <div>
-                  <h3 className="font-medium">Kitchen Renovation</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Started 2 weeks ago</p>
-                </div>
-                <span className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded-full text-sm">
-                  In Progress
-                </span>
-              </div>
-              
-              <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800">
-                <div>
-                  <h3 className="font-medium">Deck Construction</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Started 3 weeks ago</p>
-                </div>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-sm">
-                  Planning
-                </span>
-              </div>
-              
-              <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-800">
-                <div>
-                  <h3 className="font-medium">Bathroom Remodel</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Started 1 month ago</p>
-                </div>
-                <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 rounded-full text-sm">
-                  Completed
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardTitle>Create New Project</CardTitle>
-              <CardDescription>Start a new project for your customers</CardDescription>
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Active Projects", value: "12", delta: "+2 this week" },
+          { label: "Pending Quotes", value: "5", delta: "2 expiring soon" },
+          { label: "Upcoming Jobs", value: "3", delta: "Next: tomorrow" },
+          { label: "Revenue (MTD)", value: "$12,450", delta: "+8% vs last month" },
+        ].map((stat) => (
+          <Card key={stat.label} className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-xs font-medium uppercase tracking-wide">{stat.label}</CardDescription>
+              <CardTitle className="text-2xl font-bold">{stat.value}</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">Create Project</Button>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{stat.delta}</p>
             </CardContent>
           </Card>
-          
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardTitle>Send Quote</CardTitle>
-              <CardDescription>Generate and send a quote to a customer</CardDescription>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Projects */}
+        <div className="lg:col-span-2">
+          <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-base font-semibold">Recent Projects</CardTitle>
+              <Link href="/dashboard/projects" className="text-sm text-amber-600 hover:text-amber-700 font-medium">
+                View all →
+              </Link>
             </CardHeader>
-            <CardContent>
-              <Button className="w-full">Send Quote</Button>
-            </CardContent>
-          </Card>
-          
-          <Card className="border border-slate-200 dark:border-slate-800">
-            <CardHeader>
-              <CardTitle>View Reports</CardTitle>
-              <CardDescription>Check your business performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">View Reports</Button>
+            <CardContent className="p-0">
+              {[
+                { name: "Kitchen Renovation", updated: "2 hours ago", status: "In Progress", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
+                { name: "Deck Construction", updated: "Yesterday", status: "Planning", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+                { name: "Bathroom Remodel", updated: "3 days ago", status: "Completed", color: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400" },
+              ].map((project, i) => (
+                <div key={project.name} className={`flex items-center justify-between px-6 py-4 ${i < 2 ? "border-b border-slate-100 dark:border-slate-800" : ""}`}>
+                  <div>
+                    <p className="font-medium text-sm">{project.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Updated {project.updated}</p>
+                  </div>
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${project.color}`}>
+                    {project.status}
+                  </span>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-amber-500 rounded-lg"></div>
-              <span className="text-xl font-bold">BuildIt</span>
-            </div>
-            <div className="flex space-x-6">
-              <Link href="/about" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50">
-                About
+        {/* Sidebar */}
+        <div className="flex flex-col gap-4">
+          <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              <Link href="/dashboard/projects/new">
+                <Button variant="outline" className="w-full justify-start text-sm">+ Create Project</Button>
               </Link>
-              <Link href="/terms" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50">
-                Terms
+              <Link href="/dashboard/quotes/new">
+                <Button variant="outline" className="w-full justify-start text-sm">+ Send Quote</Button>
               </Link>
-              <Link href="/privacy" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50">
-                Privacy
+              <Link href="/dashboard/invoices/new">
+                <Button variant="outline" className="w-full justify-start text-sm">+ New Invoice</Button>
               </Link>
-            </div>
-          </div>
-          <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-            © {new Date().getFullYear()} BuildIt. All rights reserved.
-          </div>
+              <Link href="/consents/new">
+                <Button variant="outline" className="w-full justify-start text-sm">+ Council Consent</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">Account</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              <Link href="/profile/edit">
+                <Button variant="outline" className="w-full justify-start text-sm">Edit Profile</Button>
+              </Link>
+              <Link href="/profile/onboard">
+                <Button variant="outline" className="w-full justify-start text-sm">Business Setup</Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }

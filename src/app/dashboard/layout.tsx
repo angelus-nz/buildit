@@ -10,7 +10,11 @@ export default async function DashboardLayout({
   const session = await auth();
   if (!session) redirect("/auth/signin");
 
-  const isTradesman = session.user.role === "TRADESMAN";
+  // Customers have their own dashboard
+  if (session.user.role === "CUSTOMER") {
+    redirect("/customer");
+  }
+
   const userName = session.user.name ?? session.user.email ?? "User";
 
   return (
@@ -18,7 +22,7 @@ export default async function DashboardLayout({
       <DashboardNav
         userName={userName}
         userRole={session.user.role}
-        isTradesman={isTradesman}
+        isTradesman={true}
       />
       {/* pt-14 offsets the mobile fixed header; lg:pl-64 offsets the desktop sidebar */}
       <main className="min-h-screen pt-14 lg:pl-64 lg:pt-0">

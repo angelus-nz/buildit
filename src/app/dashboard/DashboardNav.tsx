@@ -185,12 +185,18 @@ export function DashboardNav({ userName, userRole, isTradesman }: Props) {
               <p className="text-xs capitalize text-slate-500">{userRole.toLowerCase()}</p>
             </div>
           </div>
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="cursor-pointer text-left text-sm text-slate-500 transition-colors hover:text-white"
-          >
-            Sign out
-          </button>
+          <div className="flex gap-3">
+            <Link href="/profile/edit" className="text-sm text-slate-500 transition-colors hover:text-white">
+              Profile
+            </Link>
+            <span className="text-slate-700">·</span>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="cursor-pointer text-left text-sm text-slate-500 transition-colors hover:text-white"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -240,12 +246,18 @@ export function DashboardNav({ userName, userRole, isTradesman }: Props) {
                 </div>
                 <span className="truncate text-sm text-slate-300">{userName}</span>
               </div>
-              <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="cursor-pointer text-sm text-slate-500 transition-colors hover:text-white"
-              >
-                Sign out
-              </button>
+              <div className="flex gap-3">
+                <Link href="/profile/edit" onClick={() => setMobileOpen(false)} className="text-sm text-slate-500 transition-colors hover:text-white">
+                  Profile
+                </Link>
+                <span className="text-slate-700">·</span>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="cursor-pointer text-sm text-slate-500 transition-colors hover:text-white"
+                >
+                  Sign out
+                </button>
+              </div>
             </div>
           </nav>
         </div>
