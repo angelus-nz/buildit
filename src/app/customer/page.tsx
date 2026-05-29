@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ReviewPrompts from "./ReviewPrompts";
 
 export default function CustomerDashboardPage() {
   return (
     <div>
+      <ReviewPrompts />
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">My Jobs</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">

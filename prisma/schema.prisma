@@ -78,6 +78,12 @@ model User {
 
 // ─── Business Profiles ──────────────────────────────────────────────────────
 
+enum VerificationStatus {
+  NONE
+  SELF_DECLARED
+  VERIFIED
+}
+
 enum BusinessCategory {
   PLUMBING
   ELECTRICAL
@@ -109,16 +115,37 @@ model Business {
   coverUrl    String?
   isVerified  Boolean          @default(false)
   isPublished Boolean          @default(false)
+  // Trust signals
+  lbpNumber                String?
+  nzbn                     String?
+  insuranceCarrier         String?
+  insuranceExpiry          DateTime?
+  trustVerificationStatus  VerificationStatus @default(NONE)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects      Project[]
-  reviews       Review[]
-  quotes        Quote[]
-  invoices      Invoice[]
-  inquiries     Inquiry[]
-  conversations Conversation[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects       Project[]
+  reviews        Review[]
+  quotes         Quote[]
+  invoices       Invoice[]
+  inquiries      Inquiry[]
+  conversations  Conversation[]
+  certifications Certification[]
+}
+
+model Certification {
+  id                 String             @id @default(cuid())
+  businessId         String
+  name               String
+  issuingBody        String?
+  certNumber         String?
+  expiresAt          DateTime?
+  verificationStatus VerificationStatus @default(SELF_DECLARED)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }
 
 // ─── Projects (work showcase) ────────────────────────────────────────────────
@@ -176,6 +203,7 @@ model Review {
   id         String    @id @default(cuid())
   businessId String
   authorId   String
+  invoiceId  String?   @unique
   rating     Int
   body       String?   @db.Text
   reply      String?   @db.Text
@@ -183,8 +211,9 @@ model Review {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  author   User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  author   User      @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  invoice  Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
   @@unique([businessId, authorId])
 }
@@ -364,4 +393,5 @@ model Invoice {
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   quote    Quote?   @relation(fields: [quoteId], references: [id])
+  review   Review?
 }
