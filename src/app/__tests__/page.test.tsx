@@ -12,6 +12,14 @@ vi.mock("@/lib/auth", () => ({
   auth: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    project: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+  },
+}));
+
 async function renderPage() {
   const element = await HomePage();
   return render(element);
@@ -67,6 +75,20 @@ describe("HomePage — landing page (logged-out)", () => {
       expect(ctaLinks.length).toBeGreaterThanOrEqual(1);
       const texts = ctaLinks.map((l) => l.textContent ?? "");
       expect(texts.some((t) => /start for free/i.test(t))).toBe(true);
+    });
+
+    it("renders showcase grid with demo tiles", async () => {
+      await renderPage();
+      // Demo tiles should be rendered when DB returns empty
+      expect(screen.getAllByText("Demo").length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("renders browse directory link to /find", async () => {
+      await renderPage();
+      const findLinks = screen
+        .getAllByRole("link")
+        .filter((l) => l.getAttribute("href") === "/find");
+      expect(findLinks.length).toBeGreaterThanOrEqual(1);
     });
   });
 
