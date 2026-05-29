@@ -3,6 +3,57 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 
+const DEMO_PROJECTS = [
+  {
+    title: "Kitchen Renovation",
+    tradesman: "Mike's Renovations",
+    location: "Auckland",
+    category: "Kitchen",
+    gradient: "from-amber-400 to-orange-500",
+    iconPath: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+  },
+  {
+    title: "Deck Construction",
+    tradesman: "TimberWorks NZ",
+    location: "Wellington",
+    category: "Decking",
+    gradient: "from-emerald-500 to-teal-600",
+    iconPath: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+  },
+  {
+    title: "Bathroom Retile",
+    tradesman: "Prestige Tiling Co",
+    location: "Christchurch",
+    category: "Tiling",
+    gradient: "from-blue-500 to-indigo-600",
+    iconPath: "M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z",
+  },
+  {
+    title: "New Roof Install",
+    tradesman: "Summit Roofing",
+    location: "Hamilton",
+    category: "Roofing",
+    gradient: "from-slate-600 to-slate-800",
+    iconPath: "M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
+  },
+  {
+    title: "Electrical Rewire",
+    tradesman: "Bright Spark Electrical",
+    location: "Tauranga",
+    category: "Electrical",
+    gradient: "from-yellow-400 to-amber-500",
+    iconPath: "M13 10V3L4 14h7v7l9-11h-7z",
+  },
+  {
+    title: "Concrete Driveway",
+    tradesman: "Solid Ground Co",
+    location: "Dunedin",
+    category: "Concreting",
+    gradient: "from-stone-500 to-stone-700",
+    iconPath: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+  },
+];
+
 export default async function HomePage() {
   const session = await auth();
   const isLoggedIn = !!session;
@@ -22,11 +73,11 @@ export default async function HomePage() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
+            <a href="#showcase" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors">
+              Projects
+            </a>
             <a href="#features" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors">
               Features
-            </a>
-            <a href="#testimonials" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors">
-              Testimonials
             </a>
             <Link href="/pricing" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors">
               Pricing
@@ -53,7 +104,6 @@ export default async function HomePage() {
             )}
           </nav>
 
-          {/* Mobile: show Dashboard or Sign in */}
           <div className="md:hidden">
             {isLoggedIn ? (
               <Link href="/dashboard">
@@ -73,20 +123,20 @@ export default async function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden py-20 md:py-32">
+      <section className="relative overflow-hidden pt-16 pb-8 md:pt-24 md:pb-12">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-slate-50 dark:from-amber-900/10 dark:via-slate-900 dark:to-slate-900" />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20 px-4 py-1.5 text-sm font-medium text-amber-700 dark:text-amber-400 mb-8">
+          <div className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20 px-4 py-1.5 text-sm font-medium text-amber-700 dark:text-amber-400 mb-6">
             Built for New Zealand tradesmen
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
             Win more jobs.<br />
             <span className="text-amber-500">Get paid faster.</span>
           </h1>
-          <p className="mt-6 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            BuildIt helps tradespeople showcase their work, manage quotes and invoices, and keep customers in the loop — all from your phone.
+          <p className="mt-5 text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Showcase your work, manage quotes and invoices, and keep customers in the loop — all from your phone.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             {isLoggedIn ? (
               <Link href="/dashboard">
                 <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white h-12 px-8 text-base font-semibold w-full sm:w-auto">
@@ -108,7 +158,47 @@ export default async function HomePage() {
               </>
             )}
           </div>
-          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">No credit card required</p>
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">No credit card required</p>
+        </div>
+      </section>
+
+      {/* Project Showcase Strip */}
+      <section id="showcase" className="pb-6 md:pb-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+              Real NZ jobs from real tradies
+            </p>
+            <Link href="/auth/register" className="text-sm font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors">
+              Share your work →
+            </Link>
+          </div>
+
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-6 sm:overflow-visible">
+            {DEMO_PROJECTS.map((project) => (
+              <Link
+                key={project.title}
+                href="/auth/register"
+                className="group flex-shrink-0 w-40 sm:w-auto rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+              >
+                <div className={`relative h-40 sm:h-36 bg-gradient-to-br ${project.gradient} flex items-center justify-center`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d={project.iconPath} />
+                  </svg>
+                  <div className="absolute bottom-2 left-2">
+                    <span className="inline-block bg-black/30 backdrop-blur-sm text-white text-xs font-medium px-2 py-0.5 rounded-full">
+                      {project.category}
+                    </span>
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-slate-800 px-3 py-2.5 border border-t-0 border-slate-100 dark:border-slate-700 rounded-b-2xl">
+                  <p className="text-xs font-semibold text-slate-900 dark:text-slate-50 truncate">{project.title}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{project.tradesman}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{project.location}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -160,7 +250,7 @@ export default async function HomePage() {
                 description: "Pre-filled council consent forms from your project details. Reduce paperwork and delays.",
               },
               {
-                iconPath: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+                iconPath: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 11.574 3 10c0-4.418 4.03-8 9-8s9 3.582 9 8z",
                 title: "Customer Messaging",
                 description: "All your customer conversations in one place. Never miss a job inquiry again.",
               },
@@ -204,9 +294,9 @@ export default async function HomePage() {
             {[
               {
                 quote: "BuildIt helped us showcase our work to customers in a way that really built trust. Our conversion rate has increased significantly since we started using it.",
-                name: "John Doe",
+                name: "Mike Thompson",
                 role: "Construction Contractor, Auckland",
-                initials: "JD",
+                initials: "MT",
                 color: "bg-amber-500",
               },
               {
@@ -285,6 +375,7 @@ export default async function HomePage() {
                 </>
               ) : (
                 <>
+                  <Link href="/pricing" className="hover:text-slate-900 dark:hover:text-slate-50 transition-colors">Pricing</Link>
                   <Link href="/auth/signin" className="hover:text-slate-900 dark:hover:text-slate-50 transition-colors">Sign in</Link>
                   <Link href="/auth/register" className="hover:text-slate-900 dark:hover:text-slate-50 transition-colors">Sign up</Link>
                 </>
