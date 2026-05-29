@@ -9,8 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Vercel-Supabase integration sets POSTGRES_PRISMA_URL (transaction pooler)
-    // Fall back to DATABASE_URL for local dev
-    url: process.env["POSTGRES_PRISMA_URL"] ?? process.env["DATABASE_URL"],
+    // prisma migrate deploy needs a direct (non-pooled) connection for DDL.
+    // POSTGRES_URL_NON_POOLING bypasses PgBouncer; POSTGRES_PRISMA_URL hangs on DDL.
+    url: process.env["POSTGRES_URL_NON_POOLING"] ?? process.env["DATABASE_URL"],
   },
 });
