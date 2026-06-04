@@ -16,8 +16,10 @@ MIGRATIONS=(
   "20260529140000_add_review_invoice_link"
 )
 
+set +e
 OUTPUT=$(npx prisma migrate deploy 2>&1)
 EXIT_CODE=$?
+set -e
 
 if echo "$OUTPUT" | grep -q "P3005"; then
   echo "P3005: database has existing schema but no migration history. Baselining..."
