@@ -116,13 +116,13 @@ export function DashboardNav({ userName, userRole, isTradesman }: Props) {
   }, []);
 
   const navItems: NavItem[] = [
-    { href: "/dashboard", label: "Dashboard", Icon: HomeIcon, exactMatch: true },
+    { href: "/dashboard", label: "Workshop Pulse", Icon: HomeIcon, exactMatch: true },
     ...(isTradesman
       ? [
-          { href: "/dashboard/projects", label: "Projects", Icon: FolderIcon },
-          { href: "/dashboard/quotes", label: "Quotes", Icon: DocumentTextIcon },
-          { href: "/dashboard/invoices", label: "Invoices", Icon: ReceiptIcon },
-          { href: "/dashboard/inbox", label: "Inquiries", Icon: InboxIcon },
+          { href: "/dashboard/projects", label: "Jobs", Icon: FolderIcon },
+          { href: "/dashboard/inbox", label: "Clients", Icon: InboxIcon },
+          { href: "/dashboard/invoices", label: "Parts", Icon: ReceiptIcon },
+          { href: "/dashboard/quotes", label: "Reports", Icon: DocumentTextIcon },
         ]
       : []),
     { href: "/messages", label: "Messages", Icon: ChatBubbleIcon, badge: unreadCount },
