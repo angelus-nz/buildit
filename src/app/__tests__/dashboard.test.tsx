@@ -1,94 +1,71 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import DashboardPage from "../dashboard/page";
 
-vi.mock("next/link", () => ({
-  default: ({ href, children }: { href: string; children: React.ReactNode }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
-
 describe("DashboardPage", () => {
-  describe("Page heading", () => {
-    it("renders Dashboard heading", () => {
-      render(<DashboardPage />);
-      expect(screen.getByRole("heading", { name: /dashboard/i })).toBeDefined();
-    });
+  it("renders the Workshop Pulse heading and workshop IA", () => {
+    render(<DashboardPage />);
 
-    it("renders New Project CTA linking to /dashboard/projects/new", () => {
-      render(<DashboardPage />);
-      const link = screen.getByRole("link", { name: /new project/i });
-      expect(link).toHaveAttribute("href", "/dashboard/projects/new");
-    });
+    expect(screen.getByRole("heading", { name: /workshop pulse/i })).toBeDefined();
+    expect(screen.getByRole("heading", { name: /jobs/i })).toBeDefined();
+    expect(screen.getByRole("heading", { name: /client visibility queue/i })).toBeDefined();
+    expect(screen.getByRole("heading", { name: /emptystate: no urgent part requests/i })).toBeDefined();
+    expect(screen.getByRole("heading", { name: /workshop confidence report/i })).toBeDefined();
   });
 
-  describe("Stats overview", () => {
-    it("renders Active Projects metric card", () => {
-      render(<DashboardPage />);
-      expect(screen.getByText("Active Projects")).toBeDefined();
-    });
+  it("renders required dashboard components from synthetic workshop data", () => {
+    render(<DashboardPage />);
 
-    it("renders Pending Quotes metric card", () => {
-      render(<DashboardPage />);
-      expect(screen.getByText("Pending Quotes")).toBeDefined();
-    });
-
-    it("renders Revenue metric card", () => {
-      render(<DashboardPage />);
-      expect(screen.getByText("Revenue (MTD)")).toBeDefined();
-    });
+    expect(screen.getByText("ReviewBanner")).toBeDefined();
+    expect(screen.getByText("ActionQueue")).toBeDefined();
+    expect(screen.getByText("MediaUploader")).toBeDefined();
+    expect(screen.getByText("Kowhai Street deck rebuild")).toBeDefined();
+    expect(screen.getByText("Old joists removed")).toBeDefined();
+    expect(screen.getAllByText(/status:/i).length).toBeGreaterThanOrEqual(3);
   });
 
-  describe("Recent projects", () => {
-    it("renders View all link to /dashboard/projects", () => {
-      render(<DashboardPage />);
-      const link = screen.getByRole("link", { name: /view all/i });
-      expect(link).toHaveAttribute("href", "/dashboard/projects");
-    });
+  it("renders workshop metric cards", () => {
+    render(<DashboardPage />);
 
-    it("renders Kitchen Renovation project row", () => {
-      render(<DashboardPage />);
-      expect(screen.getByText("Kitchen Renovation")).toBeDefined();
-    });
+    expect(screen.getByText("Active Jobs")).toBeDefined();
+    expect(screen.getByText("Client Updates")).toBeDefined();
+    expect(screen.getByText("Parts Waiting")).toBeDefined();
   });
 
-  describe("Quick actions — all links must work (US-3, US-4)", () => {
-    it("Create Project links to /dashboard/projects/new", () => {
-      render(<DashboardPage />);
-      const links = screen
-        .getAllByRole("link")
-        .filter((l) => l.getAttribute("href") === "/dashboard/projects/new");
-      expect(links.length).toBeGreaterThanOrEqual(1);
-    });
+  it("switches the job detail timeline when a job is selected", () => {
+    render(<DashboardPage />);
 
-    it("Edit Profile links to /profile/edit", () => {
-      render(<DashboardPage />);
-      const link = screen.getByRole("link", { name: /edit profile/i });
-      expect(link).toHaveAttribute("href", "/profile/edit");
-    });
-
-    it("Send Quote links to /dashboard/quotes/new", () => {
-      render(<DashboardPage />);
-      const link = screen.getByRole("link", { name: /send quote/i });
-      expect(link).toHaveAttribute("href", "/dashboard/quotes/new");
-    });
-
-    it("New Invoice links to /dashboard/invoices/new", () => {
-      render(<DashboardPage />);
-      const link = screen.getByRole("link", { name: /new invoice/i });
-      expect(link).toHaveAttribute("href", "/dashboard/invoices/new");
-    });
+    fireEvent.click(screen.getAllByRole("button", { name: /view job/i })[1]);
+    expect(screen.getByText("Harbour Road bathroom rough-in")).toBeDefined();
+    expect(screen.getByText("Pressure test passed")).toBeDefined();
   });
 
-  describe("Design tokens", () => {
-    it("renders white card backgrounds", () => {
-      const { container } = render(<DashboardPage />);
-      expect(container.innerHTML).toContain("bg-white");
-    });
+  it("validates short progress updates inline", () => {
+    render(<DashboardPage />);
 
-    it("uses amber accent for primary CTA", () => {
-      const { container } = render(<DashboardPage />);
-      expect(container.innerHTML).toContain("bg-amber-500");
+    fireEvent.change(screen.getByLabelText(/plain-language update/i), { target: { value: "Too short" } });
+    fireEvent.click(screen.getByRole("button", { name: /add progress update/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(/at least 20 characters/i);
+  });
+
+  it("records explicit client visibility state for valid updates", () => {
+    render(<DashboardPage />);
+
+    fireEvent.change(screen.getByLabelText(/plain-language update/i), {
+      target: { value: "Framing passed inspection and roof trusses are staged for Friday." },
     });
+    fireEvent.click(screen.getByLabelText(/internal only/i));
+    fireEvent.click(screen.getByRole("button", { name: /add progress update/i }));
+
+    expect(screen.getByText(/progress update added as internal only/i)).toBeDefined();
+  });
+
+  it("uses tokenized workshop style hooks", () => {
+    const { container } = render(<DashboardPage />);
+
+    expect(container.innerHTML).toContain("var(--workshop-card)");
+    expect(container.innerHTML).toContain("var(--workshop-focus)");
+    expect(container.innerHTML).toContain("min-h-12");
   });
 });

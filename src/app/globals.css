@@ -7,8 +7,8 @@
  * Touch targets >= 44px
  */
 
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 :root {
   /* Colors */
@@ -70,6 +70,17 @@
   --transition-fast: 75ms ease-in-out;
   --transition-normal: 150ms ease-in-out;
   --transition-slow: 300ms ease-in-out;
+
+  /* Workshop Pulse redesign tokens */
+  --workshop-paper: #f5efe3;
+  --workshop-card: rgba(255, 250, 240, 0.92);
+  --workshop-ink: #1d211a;
+  --workshop-line: #d7c9aa;
+  --workshop-hi-vis: #f59e0b;
+  --workshop-rust: #b95135;
+  --workshop-sage: #54735f;
+  --workshop-focus: #1455d9;
+  --workshop-shadow: 0 24px 60px rgba(47, 42, 34, 0.14);
 }
 
 .dark {
@@ -102,6 +113,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  :focus-visible {
+    outline: 3px solid var(--workshop-focus);
+    outline-offset: 3px;
+  }
+
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
@@ -116,6 +132,17 @@
   h4 { font-size: 1.25rem; }
   h5 { font-size: 1.125rem; }
   h6 { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 /* Links — in @layer base so Tailwind text-* utilities can override */
