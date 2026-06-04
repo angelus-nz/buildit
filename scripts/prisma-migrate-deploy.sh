@@ -4,8 +4,6 @@
 set -e
 
 MIGRATIONS=(
-  "20260526_add_inquiry_model"
-  "20260526_add_project_updates"
   "20260526213803_init"
   "20260526220834_consent_applications"
   "20260526222851_add_review_reply"
