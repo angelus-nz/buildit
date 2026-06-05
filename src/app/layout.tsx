@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BuildIt - Showcase Your Work in Progress",
+  title: "Global Workshop - Tradesman Small Business Experience",
   description: "Tradesman platform for small businesses to showcase work in progress, manage their business, and find new customers.",
 };
 

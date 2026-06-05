@@ -173,7 +173,7 @@ export default async function HomePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <span className="text-xl font-bold tracking-tight">BuildIt</span>
+            <span className="text-xl font-bold tracking-tight">Global Workshop</span>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
@@ -360,7 +360,7 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center space-x-2">
               <div className="w-7 h-7 bg-amber-500 rounded-lg" />
-              <span className="font-bold">BuildIt</span>
+              <span className="font-bold">Global Workshop</span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-slate-500 dark:text-slate-400">
               {isLoggedIn ? (
